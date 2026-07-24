@@ -1,0 +1,458 @@
+openapi: 3.0.0
+info:
+  title: Climate FieldView Platform APIs Boundaries Uploads API
+  description: "**Last Modified**: Mon Dec  8 16:27:39 UTC 2025\n\n\nAll endpoints are only accessible via HTTPS.\n\n* All API endpoints are located at `https://platform.climate.com` (e.g.\n`https://platform.climate.com/v4/fields`).\n\n* The authorization token endpoint is located at\n`https://api.climate.com/api/oauth/token`.\n\n## Troubleshooting\n\n`X-Http-Request-Id` response header will be returned on every call,\nsuccessful or not. If you experience an issue with our api and need\nto contact technical support, please supply the value of the `X-Http-Request-Id`\nheader along with an approximate time of when the request was made.\n\n## Request Limits\n\nWhen you’re onboarded to Climate’s API platform, your `x-api-key` is assigned a custom usage plan. Usage plans are unique to each partner and have the following key attributes: \n\n1. Throttling information\n    * burstLimit: Maximum rate limit over a period ranging from 1 second to a few seconds\n    * rateLimit: A steady-state rate limit\n\n2. Quota information\n    * Limit: The maximum number of requests that can be made in a given month\n\nWhen the request rate threshold is exceeded, a `429` response code is returned. Optionally, the [`Retry-After`](https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.37) header may be returned: \n\nFollowing are examples of rate limit errors:\n\n1. Rate limit exceeded:\n\n<br>HTTP/1.1 429 \n<br>Content-Type: application/json\n<br>Content-Length: 32\n\n   {\"message\":\"Too Many Requests\"}\n\n2. Quota exhausted:\n<br>HTTP/1.1 429 \n<br>Content-Type: application/json\n<br>Content-Length: 29\n\n    {\"message\":\"Limit Exceeded\"}\n\n## Pagination\n\nPagination is performed via headers. Any request which returns a `\"results\"`\narray may be paginated. The following figure shows how query results are laid out with\nX-Limit=4 and no filter applied.\n\n<img style=\"width:70%;height:auto;\" src=\"https://s3-us-west-2.amazonaws.com/climate-com/images/svg_upload_tests/paging.png\">\n\n* If there are no results, a response code of `304` will be returned.\n\n* If the response is the last set of results, a response code of `200` or\n`206` will be returned.\n\n* If there are more results, a response code of `206` will be returned.\n\n* If `X-Next-Token` is provided in the request headers but the token has\nexpired, a response code of `409` will be returned. This is only applicable\nfor some endpoints; see specific endpoint documentation below.\n\n#### X-Limit\n\nThe page size can be controlled with the `X-Limit` header. Valid values are\n`1-100` and defaults to `100`.\n\n#### X-Next-Token\n\nIf the results are paginated, a response header of `X-Next-Token` will be\nreturned. Use the associated value in the subsequent request (via the `X-Next-Token`\nrequest header) to retrieve the next page. The following sequence diagram shows how to\nuse `X-Next-Token` to fetch all the records.\n\n<img src=\"https://s3-us-west-2.amazonaws.com/climate-com/images/svg_upload_tests/x-next-token.svg\">\n\n\n## Chunked Uploads\n\nUploads larger than `5MiB` (`5242880 bytes`) must be done in `5MiB` chunks\n(with the exception of the final chunk). Each chunk request MUST contain a\n`Content-Range` header specifying the portion of the upload, and a `Content-Type`\nheader specifying binary content type (`application/octet-stream`). Range\nuploads must be contiguous. The maximum upload size is capped at `500MiB` (`524288000 bytes`).\n\n## Chunked Downloads\n\nDownloads larger than `5MiB` (`5242880 bytes`) must be done in `1-5MiB`\nchunks (with the exception of the final chunk, which may be less than `1MiB`).\nEach chunk request MUST contain a `Range` header specifying the requested portion of the download,\nand an `Accept` header specifying binary and json content types  (`application/octet-stream,application/json`)\nor all content types (`*/*`).\n\n## Drivers\n\nIf you need drivers to process agronomic data, download the ADAPT plugin below. We only support the plugin in the Windows environment, minimum is Windows 7 SP1.\n\nFor asPlanted, asHarvested and asApplied data:\n* [ADAPT Plugin](https://dev.fieldview.com/drivers/ClimateADAPTPlugin_latest.exe)\n<br>Release notes can be found [here](https://dev.fieldview.com/drivers/adapt-release-notes.txt).\n<br>Download and use of the ADAPT plugin means that you agree to the EULA for use of the ADAPT plugin. \n<br>Please review the [EULA](https://dev.fieldview.com/EULA/ADAPT%20Plugin%20EULA-06-19.pdf) (last updated on June 6th, 2019) before download and use of the ADAPT plugin.\n<br>For more information, please refer to:\n  * [ADAPT Resources](https://adaptframework.org/)\n  * [ADAPT Overview](https://aggateway.atlassian.net/wiki/spaces/ADM/overview)\n  * [ADAPT FAQ](https://aggateway.atlassian.net/wiki/spaces/ADM/pages/165942474/ADAPT+Frequently-Asked+Questions+FAQ)\n  * [ADAPT Videos](https://adaptframework.org/adapt-videos/)\n\n## Sample Test Data\n\nSample agronomic data:\n* [asPlanted and asHarvested data](https://dev.fieldview.com/sample-agronomic-data/Planting_Harvesting_data_04_18_2018_21_46_18.zip)\n* [asApplied data set 1](https://dev.fieldview.com/sample-agronomic-data/as-applied-data1.zip)\n* [asApplied data set 2](https://dev.fieldview.com/sample-agronomic-data/as-applied-data2.zip)\n<br>To upload the sample data to your account, please follow the instructions in this [link](https://support.climate.com/kt#/kA02A000000AaxzSAC/en_US).\n\nSample soil data:\n* [Sample soil data](https://dev.fieldview.com/sample-soil-data/soil-sample.xml)\n---\n"
+  contact:
+    name: Climate FieldView Support
+    email: developer@climate.com
+  version: 4.0.11
+servers:
+- url: https://platform.climate.com/
+tags:
+- name: Uploads
+  description: General data upload endpoints.
+paths:
+  /v4/uploads:
+    post:
+      summary: Initiate a new upload
+      description: "Step one in uploading a data product. The method will return an **Upload** ID which the caller will use in subsequent `PUT` requests.\nThe following `contentTypes` may be uploaded:\n    <details><summary>__image/vnd.climate.thermal.geotiff__</summary>\n\n    Allows for the upload of a thermal image. The image is a single band geotiff with 64 bit signed floating point values in degrees Celsius. The Coordinate Reference System (CRS) must be UTM with WGS84 datum.\n\n    The following metadata entries are required to be embedded in the geotiff:\n      * acquisitionStartDate - ISO8601 date\n      * acquisitionEndDate - ISO8601 date\n      * isCalibrated - boolean\n\n    The following metadata entries are optional:\n      * sourceId - uuid referencing the asset in the partner's system\n      * fieldId - uuid referencing a field in the Climate system\n      * boundaryId - uuid referencing a boundary in the Climate system\n      * brandId - uuid referencing a partner's branding in the Climate system\n      * name - name of the layer. The maximum number of characters that will be accepted as input is 20.\n\n    Requires either imagery:write or platform scope.\n  </details>\n  <details><summary>__image/vnd.climate.ndvi.geotiff__</summary>\n\n    Allows for the upload of a NDVI image. The image is a single band geotiff with 64 bit signed floating point values in the range of -1 to 1 inclusive. The Coordinate Reference System (CRS) must be UTM with WGS84 datum.\n\n    The following metadata entries are required to be embedded in the geotiff:\n      * acquisitionStartDate - ISO8601 date\n      * acquisitionEndDate - ISO8601 date\n\n    The following metadata entries are optional:\n      * sourceId - uuid referencing the asset in the partner's system\n      * fieldId - uuid referencing a field in the Climate system\n      * boundaryId - uuid referencing a boundary in the Climate system\n      * brandId - uuid referencing a partner's branding in the Climate system\n      * name - name of the layer. The maximum number of characters that will be accepted as input is 20.\n\n    Requires either imagery:write or platform scope.\n  </details>\n  <details><summary> __image/vnd.climate.rgb.geotiff__</summary>\n\n    Allows for the upload of a true color image. The image is a multi band geotiff with 24-bit composite values. Each band is 8 bits with values in the range of 0 to 255. The Coordinate Reference System (CRS) must be UTM with WGS84 datum. The geotiff must contain 3 bands in the order Red, Green, Blue.\n\n    The following metadata entries are required to be embedded in the geotiff:\n      * acquisitionStartDate - ISO8601 date\n      * acquisitionEndDate - ISO8601 date\n      * isCalibrated - boolean\n\n    The following metadata entries are optional:\n      * sourceId - uuid referencing the asset in the partner's system\n      * fieldId - uuid referencing a field in the Climate system\n      * boundaryId - uuid referencing a boundary in the Climate system\n      * brandId - uuid referencing a partner's branding in the Climate system\n      * reflectanceComputeMethod - either TOA or GROUND\n      * name - name of the layer. The maximum number of characters that will be accepted as input is 20.\n\n    Requires either imagery:write or platform scope.\n  </details>\n  <details><summary> __image/vnd.climate.rgb-nir.geotiff__</summary>\n\n    Allows for the upload of a Near Infrared (NIR) image. The Coordinate Reference System (CRS) must be UTM with WGS84 datum.\n\n    The following metadata entries are required to be embedded in the geotiff:\n      * acquisitionStartDate - ISO8601 date\n      * acquisitionEndDate - ISO8601 date\n      * isCalibrated - boolean\n\n    The following metadata entries are optional:\n      * sourceId - uuid referencing the asset in the partner's system\n      * fieldId - uuid referencing a field in the Climate system\n      * boundaryId - uuid referencing a boundary in the Climate system\n      * brandId - uuid referencing a partner's branding in the Climate system\n      * reflectanceComputeMethod - either TOA or GROUND\n      * name - name of the layer. The maximum number of characters that will be accepted as input is 20.\n\n    Requires either imagery:write or platform scope.\n  </details>\n  <details><summary>__image/vnd.climate.rgb-cir.geotiff__</summary>\n\n    Allows for the upload of a Color Infrared (CIR) image. The Coordinate Reference System (CRS) must be UTM with WGS84 datum.\n\n    The following metadata entries are required to be embedded in the geotiff:\n      * acquisitionStartDate - ISO8601 date\n      * acquisitionEndDate - ISO8601 date\n      * isCalibrated - boolean\n\n    The following metadata entries are optional:\n      * sourceId - uuid referencing the asset in the partner's system\n      * fieldId - uuid referencing a field in the Climate system\n      * boundaryId - uuid referencing a boundary in the Climate system\n      * brandId - uuid referencing a partner's branding in the Climate system\n      * reflectanceComputeMethod - either TOA or GROUND\n      * name - name of the layer. The maximum number of characters that will be accepted as input is 20.\n\n    Requires either imagery:write or platform scope.\n  </details>\n  <details><summary> __application/vnd.climate.rx.planting.shp__</summary>\n\n    Allows for the upload of a planting prescription in shapefile format.  The upload must be an archive in the zip format.  It should contain one and only one of each of the following file types:\n      * .shp\n      * .shx\n      * .dbf\n\n    All files with the above suffixes must have the same prefix, ie Back40.shp, Back40.shx and Back40.dbf.\n\n    Requires either rx:write or platform scope.\n  </details>\n  <details><summary> __application/vnd.climate.prescription.zones.shp__</summary>\n\n    Allows for the upload of a zones prescription in shapefile format.  The upload must be an archive in the zip format.  It should contain one and only one of each of the following file types:\n      * .shp\n      * .shx\n      * .dbf\n\n    All files with the above suffixes must have the same prefix, ie Back40.shp, Back40.shx and Back40.dbf.\n\n    The following metadata entries are required:\n      * fieldId - field identifier for prescription zones.\n    \n    Requires either rxZones:write or platform scope.\n  </details>\n  <details><summary> __application/vnd.climate.modus.xml__</summary>\n\n    Allows for the upload of a soil sampling file in the modus 1.0 format with some restrictions.  The upload must be a single xml file.\n\n    The following elements are required to be present in the modus file.\n      * EventCode - Max length of 64 bytes\n      * EventDate - Must be in ISO8601\n      * SoilSample - Has a maxOccurs of 20k\n      * Depth - Has a maxOccurs of 50\n      * LabName - Must be non-empty.\n      * StartingDepth - 0 to 36 inclusive, default 0\n      * EndingDepth - 1 - 36 inclusive, default 1\n      * ColumnDepth\n      * DepthUnit - must be inches\n      * Geometry - point in wgs84\n    \n    Requires the soil:write scope.\n   </details>\n   <details><summary> __application/vnd.climate.as-applied.zip__</summary>\n\n    Allows for the upload of a valid application data [supported formats](https://support.climate.com/kt#/kA02A000000DjvOSAS/en_US).\n\n    The following metadata entries are required:\n      * fileName - name of the file being uploaded.\n\n    The following metadata entries are optional:\n      * resourceOwner - the grower's account email, where dealer/partner wants to upload data. As a prerequisite the grower must share their operation with the dealer/partner.\n\n    Requires `asApplied:write` scope.\n   </details>\n   <details><summary> __application/vnd.climate.as-planted.zip__</summary>\n\n    Allows for the upload of a valid planting data [supported formats](https://support.climate.com/kt#/kA02A000000DjvOSAS/en_US).\n\n    The following metadata entries are required:\n      * fileName - name of the file being uploaded.\n\n    The following metadata entries are optional:\n      * resourceOwner - the grower's account email, where dealer/partner wants to upload data. As a prerequisite the grower must share their operation with the dealer/partner.\n\n    Requires `asPlanted:write` scope.\n   </details>\n   <details><summary> __application/vnd.climate.as-harvested.zip__</summary>\n\n    Allows for the upload of a valid harvest data [supported formats](https://support.climate.com/kt#/kA02A000000DjvOSAS/en_US).\n\n    The following metadata entries are required:\n      * fileName - name of the file being uploaded.\n\n    The following metadata entries are optional:\n      * resourceOwner - the grower's account email, where dealer/partner wants to upload data. As a prerequisite the grower must share their operation with the dealer/partner.\n\n    Requires `asHarvested:write` scope.\n   </details>"
+      operationId: postUpload
+      tags:
+      - Uploads
+      security:
+      - api_key: []
+      - oauth2_authorization_code:
+        - platform
+        - fields:write
+        - imagery:write
+        - rx:write
+        - standCount:write
+        - weedCount:write
+        - asApplied:write
+        - asPlanted:write
+        - asHarvested:write
+      parameters:
+      - $ref: '#/components/parameters/X-Recipient-Email'
+      responses:
+        '201':
+          $ref: '#/components/responses/PostUploadOk'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '429':
+          $ref: '#/components/responses/429'
+        '500':
+          $ref: '#/components/responses/500'
+        '503':
+          $ref: '#/components/responses/503'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Upload'
+  /v4/uploads/{uploadId}:
+    put:
+      summary: Chunked upload of data
+      description: Send chunked data for an **Upload**.
+      operationId: chunkedUpload
+      tags:
+      - Uploads
+      security:
+      - api_key: []
+      - oauth2_authorization_code:
+        - platform
+        - fields:write
+        - imagery:write
+        - rx:write
+        - soil:write
+        - asApplied:write
+        - asPlanted:write
+        - asHarvested:write
+      parameters:
+      - $ref: '#/components/parameters/ContentRange'
+      - $ref: '#/components/parameters/UploadId'
+      - $ref: '#/components/parameters/BinaryContentType'
+      responses:
+        '204':
+          $ref: '#/components/responses/204'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '429':
+          $ref: '#/components/responses/429'
+        '500':
+          $ref: '#/components/responses/500'
+        '503':
+          $ref: '#/components/responses/503'
+  /v4/uploads/{uploadId}/status:
+    get:
+      summary: Retrieve Upload status
+      description: Check the status of an **Upload** by ID.
+      operationId: fetchUploadStatusById
+      tags:
+      - Uploads
+      security:
+      - api_key: []
+      - oauth2_authorization_code:
+        - platform
+        - fields:write
+        - imagery:write
+        - rx:write
+        - asApplied:write
+        - asPlanted:write
+        - asHarvested:write
+      parameters:
+      - $ref: '#/components/parameters/UploadId'
+      responses:
+        '200':
+          $ref: '#/components/responses/FetchUploadStatusByIdOk'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '429':
+          $ref: '#/components/responses/429'
+        '500':
+          $ref: '#/components/responses/500'
+        '503':
+          $ref: '#/components/responses/503'
+  /v4/uploads/status/query:
+    post:
+      summary: Retrieve Upload statuses in batch
+      description: Check the status of multiple **Uploads** (up to 100 per request).
+      operationId: fetchUploadStatuses
+      tags:
+      - Uploads
+      security:
+      - api_key: []
+      - oauth2_authorization_code:
+        - platform
+        - fields:write
+        - imagery:write
+        - rx:write
+        - asApplied:write
+        - asPlanted:write
+        - asHarvested:write
+      responses:
+        '200':
+          $ref: '#/components/responses/FetchUploadStatusesOk'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '429':
+          $ref: '#/components/responses/429'
+        '500':
+          $ref: '#/components/responses/500'
+        '503':
+          $ref: '#/components/responses/503'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UploadStatusQuery'
+components:
+  parameters:
+    BinaryContentType:
+      in: header
+      name: Content-Type
+      description: Must be `application/octet-stream`
+      required: true
+      schema:
+        type: string
+    ContentRange:
+      in: header
+      name: Content-Range
+      description: Byte range `bytes start-end/total` (https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.16). e.g. bytes 0-5242880/10242880. Downloads larger than 5MiB (5242880 bytes) in size must be downloaded in chunks no larger than 5MiB (5242880 bytes) and no smaller than 1MiB (1048576 bytes). The last chunk could be less than 1MiB (1048576 bytes).
+      required: true
+      schema:
+        type: string
+    X-Recipient-Email:
+      in: header
+      name: X-Recipient-Email
+      description: Email address associated with a Climate account, used when to sending to another user.
+      required: false
+      schema:
+        type: string
+    UploadId:
+      in: path
+      description: Unique identifier of an Upload.
+      name: uploadId
+      required: true
+      schema:
+        type: string
+        format: uuid
+  responses:
+    '204':
+      description: No Content
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+    '401':
+      description: Unauthorized
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    PostUploadOk:
+      description: Returns a new upload with ID used to PUT file contents.
+      headers:
+        X-Http-Request-Id:
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CreatedUpload'
+    FetchUploadStatusesOk:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UploadStatuses'
+    '404':
+      description: Not Found
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '429':
+      description: Too Many Requests
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    FetchUploadStatusByIdOk:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UploadStatus'
+    '403':
+      description: Forbidden
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '503':
+      description: Server Busy
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+        Retry-After:
+          description: Number of seconds to wait before retrying the request.
+          schema:
+            type: integer
+            format: int32
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '400':
+      description: Bad Input
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '500':
+      description: Internal Server Error
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  schemas:
+    UploadStatus:
+      type: object
+      required:
+      - id
+      - status
+      properties:
+        id:
+          description: Unique identifier for the upload.
+          type: string
+          format: uuid
+        status:
+          description: "Current status of the upload:\n  * `UPLOADING` - Uploading has started, parts are still coming in.\n  * `INVALID` - Upload has failed validity check.\n  * `PENDING` - Upload has been received by Climate and is being processed.\n  * `INBOX` - The upload is awaiting user acceptance in their Data Inbox.\n  * `DECLINED` - The user has declined the upload in their Data Inbox.\n  * `IMPORTING` - The user has accepted the upload and it is being imported into their account.\n  * `SUCCESS` - The upload has been successfully imported.\n"
+          type: string
+          enum:
+          - UPLOADING
+          - INVALID
+          - PENDING
+          - INBOX
+          - DECLINED
+          - IMPORTING
+          - SUCCESS
+    CreatedUpload:
+      type: string
+      format: uuid
+      description: Successfully created upload request
+    UploadStatusQuery:
+      type: object
+      required:
+      - ids
+      properties:
+        ids:
+          type: array
+          items:
+            description: Unique identifier for the upload.
+            type: string
+            format: uuid
+    Upload:
+      type: object
+      description: Client request to upload data for a user.
+      required:
+      - contentType
+      - md5
+      - length
+      properties:
+        contentType:
+          type: string
+          enum:
+          - image/vnd.climate.thermal.geotiff
+          - image/vnd.climate.ndvi.geotiff
+          - image/vnd.climate.rgb.geotiff
+          - image/vnd.climate.rgb-nir.geotiff
+          - image/vnd.climate.rgb-cir.geotiff
+          - image/vnd.climate.waterstress.geotiff
+          - image/vnd.climate.elevation.geotiff
+          - image/vnd.climate.raw.geotiff
+          - application/vnd.climate.field.geojson
+          - application/vnd.climate.rx.planting.shp
+          - application/vnd.climate.prescription.zones.shp
+          - application/vnd.climate.modus.xml
+          - application/vnd.climate.as-applied.zip
+          - application/vnd.climate.as-planted.zip
+          - application/vnd.climate.as-harvested.zip
+          format: mime-type
+          description: Content type representing data being uploaded (e.g. image/vnd.climate.rgb.geotiff)
+        md5:
+          type: string
+          description: Base64 encoded md5 hash of the content
+        length:
+          type: integer
+          format: int64
+          description: Content size in bytes
+        metadata:
+          $ref: '#/components/schemas/Metadata'
+    UploadStatuses:
+      type: object
+      required:
+      - results
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/UploadStatus'
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          required:
+          - id
+          - code
+          - message
+          properties:
+            id:
+              type: string
+              format: uuid
+            code:
+              type: string
+            message:
+              type: string
+              description: Description of the error encountered.
+    Metadata:
+      type: object
+      additionalProperties: true
+  securitySchemes:
+    oauth2_authorization_code:
+      description: 'Log in with FieldView OAuth2 provider (Authorization Code Grant). Used to authorize the client (partner) and
+
+        user. The *access_token* is required to be provided in the `Authorization` header on all calls to the FieldView
+
+        APIs with the following format `Bearer $access_token`.'
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://climate.com/static/app-login/
+          tokenUrl: https://api.climate.com/api/oauth/token
+          scopes:
+            platform: (DEPRECATED) Legacy scope used for some Platform APIs
+            fields:read: Required for retrieving field and boundary information
+            farmOrganizations:read: Required for retrieving farm organization information
+            operations:read: Required for retrieving operation information
+            resourceOwners:read: Required for retrieving resource owner information
+            scouting:read: Required for retrieving user\'s scouting information
+            exports:read: Required for requesting or retrieving exports
+            fields:write: Required for uploading field boundaries
+            imagery:write: Required for uploading imagery
+            rx:write: Required for uploading prescriptions
+            soil:write: Required for uploading soil sample results
+            asApplied:read: Required for retrieving as applied data
+            asApplied:write: Required for uploading application data
+            asPlanted:read: Required for retrieving planting data
+            asPlanted:write: Required for uploading planting data
+            asHarvested:read: Required for retrieving harvest data
+            asHarvested:write: Required for uploading harvest data
+            diagnostics:read: Required for retrieving CNH machine diagnostic data
+            plantingActivitySummary:read: Required for retrieving planting activity summary data
+            customerInsights:read: Required for retrieving customer insights metrics data
+            avroAgronomicData:read: Required for retrieving agronomic data
+    api_key:
+      description: 'API access key used to control throttling (429 responses).  This key is typically formatted:
+
+        `partner-{name}-{uuid}`'
+      type: apiKey
+      name: X-Api-Key
+      in: header
+x-amazon-apigateway-api-key-source: AUTHORIZER

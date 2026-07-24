@@ -1,0 +1,408 @@
+openapi: 3.0.0
+info:
+  title: Climate FieldView Platform APIs Boundaries API
+  description: "**Last Modified**: Mon Dec  8 16:27:39 UTC 2025\n\n\nAll endpoints are only accessible via HTTPS.\n\n* All API endpoints are located at `https://platform.climate.com` (e.g.\n`https://platform.climate.com/v4/fields`).\n\n* The authorization token endpoint is located at\n`https://api.climate.com/api/oauth/token`.\n\n## Troubleshooting\n\n`X-Http-Request-Id` response header will be returned on every call,\nsuccessful or not. If you experience an issue with our api and need\nto contact technical support, please supply the value of the `X-Http-Request-Id`\nheader along with an approximate time of when the request was made.\n\n## Request Limits\n\nWhen you’re onboarded to Climate’s API platform, your `x-api-key` is assigned a custom usage plan. Usage plans are unique to each partner and have the following key attributes: \n\n1. Throttling information\n    * burstLimit: Maximum rate limit over a period ranging from 1 second to a few seconds\n    * rateLimit: A steady-state rate limit\n\n2. Quota information\n    * Limit: The maximum number of requests that can be made in a given month\n\nWhen the request rate threshold is exceeded, a `429` response code is returned. Optionally, the [`Retry-After`](https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.37) header may be returned: \n\nFollowing are examples of rate limit errors:\n\n1. Rate limit exceeded:\n\n<br>HTTP/1.1 429 \n<br>Content-Type: application/json\n<br>Content-Length: 32\n\n   {\"message\":\"Too Many Requests\"}\n\n2. Quota exhausted:\n<br>HTTP/1.1 429 \n<br>Content-Type: application/json\n<br>Content-Length: 29\n\n    {\"message\":\"Limit Exceeded\"}\n\n## Pagination\n\nPagination is performed via headers. Any request which returns a `\"results\"`\narray may be paginated. The following figure shows how query results are laid out with\nX-Limit=4 and no filter applied.\n\n<img style=\"width:70%;height:auto;\" src=\"https://s3-us-west-2.amazonaws.com/climate-com/images/svg_upload_tests/paging.png\">\n\n* If there are no results, a response code of `304` will be returned.\n\n* If the response is the last set of results, a response code of `200` or\n`206` will be returned.\n\n* If there are more results, a response code of `206` will be returned.\n\n* If `X-Next-Token` is provided in the request headers but the token has\nexpired, a response code of `409` will be returned. This is only applicable\nfor some endpoints; see specific endpoint documentation below.\n\n#### X-Limit\n\nThe page size can be controlled with the `X-Limit` header. Valid values are\n`1-100` and defaults to `100`.\n\n#### X-Next-Token\n\nIf the results are paginated, a response header of `X-Next-Token` will be\nreturned. Use the associated value in the subsequent request (via the `X-Next-Token`\nrequest header) to retrieve the next page. The following sequence diagram shows how to\nuse `X-Next-Token` to fetch all the records.\n\n<img src=\"https://s3-us-west-2.amazonaws.com/climate-com/images/svg_upload_tests/x-next-token.svg\">\n\n\n## Chunked Uploads\n\nUploads larger than `5MiB` (`5242880 bytes`) must be done in `5MiB` chunks\n(with the exception of the final chunk). Each chunk request MUST contain a\n`Content-Range` header specifying the portion of the upload, and a `Content-Type`\nheader specifying binary content type (`application/octet-stream`). Range\nuploads must be contiguous. The maximum upload size is capped at `500MiB` (`524288000 bytes`).\n\n## Chunked Downloads\n\nDownloads larger than `5MiB` (`5242880 bytes`) must be done in `1-5MiB`\nchunks (with the exception of the final chunk, which may be less than `1MiB`).\nEach chunk request MUST contain a `Range` header specifying the requested portion of the download,\nand an `Accept` header specifying binary and json content types  (`application/octet-stream,application/json`)\nor all content types (`*/*`).\n\n## Drivers\n\nIf you need drivers to process agronomic data, download the ADAPT plugin below. We only support the plugin in the Windows environment, minimum is Windows 7 SP1.\n\nFor asPlanted, asHarvested and asApplied data:\n* [ADAPT Plugin](https://dev.fieldview.com/drivers/ClimateADAPTPlugin_latest.exe)\n<br>Release notes can be found [here](https://dev.fieldview.com/drivers/adapt-release-notes.txt).\n<br>Download and use of the ADAPT plugin means that you agree to the EULA for use of the ADAPT plugin. \n<br>Please review the [EULA](https://dev.fieldview.com/EULA/ADAPT%20Plugin%20EULA-06-19.pdf) (last updated on June 6th, 2019) before download and use of the ADAPT plugin.\n<br>For more information, please refer to:\n  * [ADAPT Resources](https://adaptframework.org/)\n  * [ADAPT Overview](https://aggateway.atlassian.net/wiki/spaces/ADM/overview)\n  * [ADAPT FAQ](https://aggateway.atlassian.net/wiki/spaces/ADM/pages/165942474/ADAPT+Frequently-Asked+Questions+FAQ)\n  * [ADAPT Videos](https://adaptframework.org/adapt-videos/)\n\n## Sample Test Data\n\nSample agronomic data:\n* [asPlanted and asHarvested data](https://dev.fieldview.com/sample-agronomic-data/Planting_Harvesting_data_04_18_2018_21_46_18.zip)\n* [asApplied data set 1](https://dev.fieldview.com/sample-agronomic-data/as-applied-data1.zip)\n* [asApplied data set 2](https://dev.fieldview.com/sample-agronomic-data/as-applied-data2.zip)\n<br>To upload the sample data to your account, please follow the instructions in this [link](https://support.climate.com/kt#/kA02A000000AaxzSAC/en_US).\n\nSample soil data:\n* [Sample soil data](https://dev.fieldview.com/sample-soil-data/soil-sample.xml)\n---\n"
+  contact:
+    name: Climate FieldView Support
+    email: developer@climate.com
+  version: 4.0.11
+servers:
+- url: https://platform.climate.com/
+tags:
+- name: Boundaries
+  description: Field Boundary data endpoints.
+paths:
+  /v4/boundaries/{boundaryId}:
+    get:
+      summary: Retrieve a Boundary by ID
+      description: Retrieve a **Boundary** by ID.
+      operationId: fetchBoundaryById
+      tags:
+      - Boundaries
+      security:
+      - api_key: []
+      - oauth2_authorization_code:
+        - platform
+        - fields:read
+      parameters:
+      - $ref: '#/components/parameters/BoundaryId'
+      responses:
+        '200':
+          $ref: '#/components/responses/FetchBoundaryByIdOk'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '429':
+          $ref: '#/components/responses/429'
+        '500':
+          $ref: '#/components/responses/500'
+        '503':
+          $ref: '#/components/responses/503'
+  /v4/boundaries/query:
+    post:
+      summary: Retrieve Boundaries in batch
+      description: Retrieve multiple **Boundaries** (up to 10 per request).
+      operationId: fetchBoundaries
+      tags:
+      - Boundaries
+      security:
+      - api_key: []
+      - oauth2_authorization_code:
+        - fields:read
+      responses:
+        '200':
+          $ref: '#/components/responses/FetchBoundariesOk'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '429':
+          $ref: '#/components/responses/429'
+        '500':
+          $ref: '#/components/responses/500'
+        '503':
+          $ref: '#/components/responses/503'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BoundariesQuery'
+  /v4/boundaries:
+    post:
+      summary: Upload a boundary
+      description: 'Upload a **Boundary** entry by passing the geometry of the boundary. This will store the boundary but will not create field in Climate FieldView and will not link to an existing field in Climate FieldView.
+
+        This is restricted to callers with **boundaries:write** scope.
+
+        To upload a field boundary for field creation in Climate FieldView, please use **POST /v4/uploads**.'
+      operationId: uploadBoundary
+      tags:
+      - Boundaries
+      security:
+      - api_key: []
+      - oauth2_authorization_code:
+        - boundaries:write
+      responses:
+        '200':
+          $ref: '#/components/responses/UploadBoundaryOk'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '429':
+          $ref: '#/components/responses/429'
+        '500':
+          $ref: '#/components/responses/500'
+        '503':
+          $ref: '#/components/responses/503'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BoundaryUpload'
+components:
+  schemas:
+    Boundary:
+      description: Arbitrary boundary.  GeoJSON Feature.
+      required:
+      - id
+      - type
+      - geometry
+      - properties
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          type: string
+          enum:
+          - Feature
+        geometry:
+          $ref: '#/components/schemas/Geometry'
+        properties:
+          $ref: '#/components/schemas/BoundaryProperties'
+    Point:
+      required:
+      - coordinates
+      - type
+      properties:
+        coordinates:
+          type: array
+          items:
+            type: number
+            format: float
+        type:
+          type: string
+      example:
+        type: Point
+        coordinates:
+        - -122.2
+        - 38.1
+    Area:
+      description: Area with units. Units are always "hectare".
+      required:
+      - q
+      - u
+      properties:
+        q:
+          type: number
+          format: float
+        u:
+          type: string
+      example:
+        q: 1
+        u: hectare
+    Boundaries:
+      description: A batch of boundary results
+      required:
+      - type
+      - features
+      properties:
+        type:
+          type: string
+          enum:
+          - FeatureCollection
+        features:
+          type: array
+          items:
+            $ref: '#/components/schemas/Boundary'
+    UploadedBoundaryId:
+      description: Unique identifier of a successfully uploaded boundary
+      required:
+      - id
+      properties:
+        id:
+          type: string
+          format: uuid
+    BoundariesQuery:
+      type: object
+      required:
+      - ids
+      properties:
+        ids:
+          type: array
+          items:
+            description: Unique identifier for the boundary.
+            type: string
+            format: uuid
+    BoundaryProperties:
+      description: Properties map.
+      required:
+      - area
+      - centroid
+      properties:
+        area:
+          $ref: '#/components/schemas/Area'
+        centroid:
+          $ref: '#/components/schemas/Point'
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          required:
+          - id
+          - code
+          - message
+          properties:
+            id:
+              type: string
+              format: uuid
+            code:
+              type: string
+            message:
+              type: string
+              description: Description of the error encountered.
+    BoundaryUpload:
+      description: Arbitrary boundary in a geometry map
+      required:
+      - geometry
+      properties:
+        geometry:
+          $ref: '#/components/schemas/Geometry'
+    Geometry:
+      description: GeoJSON
+      required:
+      - type
+      - coordinates
+      properties:
+        type:
+          type: string
+          enum:
+          - Point
+          - Polygon
+          - MultiPolygon
+        coordinates:
+          type: array
+          items:
+            type: string
+      example:
+        type: Point
+        coordinates:
+        - 0
+        - 0
+  responses:
+    UploadBoundaryOk:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UploadedBoundaryId'
+    FetchBoundariesOk:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Boundaries'
+    '401':
+      description: Unauthorized
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '404':
+      description: Not Found
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '429':
+      description: Too Many Requests
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '403':
+      description: Forbidden
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '503':
+      description: Server Busy
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+        Retry-After:
+          description: Number of seconds to wait before retrying the request.
+          schema:
+            type: integer
+            format: int32
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '400':
+      description: Bad Input
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    FetchBoundaryByIdOk:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Boundary'
+    '500':
+      description: Internal Server Error
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  parameters:
+    BoundaryId:
+      in: path
+      description: Unique identifier of the Boundary
+      name: boundaryId
+      required: true
+      schema:
+        type: string
+        format: uuid
+  securitySchemes:
+    oauth2_authorization_code:
+      description: 'Log in with FieldView OAuth2 provider (Authorization Code Grant). Used to authorize the client (partner) and
+
+        user. The *access_token* is required to be provided in the `Authorization` header on all calls to the FieldView
+
+        APIs with the following format `Bearer $access_token`.'
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://climate.com/static/app-login/
+          tokenUrl: https://api.climate.com/api/oauth/token
+          scopes:
+            platform: (DEPRECATED) Legacy scope used for some Platform APIs
+            fields:read: Required for retrieving field and boundary information
+            farmOrganizations:read: Required for retrieving farm organization information
+            operations:read: Required for retrieving operation information
+            resourceOwners:read: Required for retrieving resource owner information
+            scouting:read: Required for retrieving user\'s scouting information
+            exports:read: Required for requesting or retrieving exports
+            fields:write: Required for uploading field boundaries
+            imagery:write: Required for uploading imagery
+            rx:write: Required for uploading prescriptions
+            soil:write: Required for uploading soil sample results
+            asApplied:read: Required for retrieving as applied data
+            asApplied:write: Required for uploading application data
+            asPlanted:read: Required for retrieving planting data
+            asPlanted:write: Required for uploading planting data
+            asHarvested:read: Required for retrieving harvest data
+            asHarvested:write: Required for uploading harvest data
+            diagnostics:read: Required for retrieving CNH machine diagnostic data
+            plantingActivitySummary:read: Required for retrieving planting activity summary data
+            customerInsights:read: Required for retrieving customer insights metrics data
+            avroAgronomicData:read: Required for retrieving agronomic data
+    api_key:
+      description: 'API access key used to control throttling (429 responses).  This key is typically formatted:
+
+        `partner-{name}-{uuid}`'
+      type: apiKey
+      name: X-Api-Key
+      in: header
+x-amazon-apigateway-api-key-source: AUTHORIZER

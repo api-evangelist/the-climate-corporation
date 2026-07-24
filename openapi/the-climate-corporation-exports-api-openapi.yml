@@ -1,0 +1,459 @@
+openapi: 3.0.0
+info:
+  title: Climate FieldView Platform APIs Boundaries Exports API
+  description: "**Last Modified**: Mon Dec  8 16:27:39 UTC 2025\n\n\nAll endpoints are only accessible via HTTPS.\n\n* All API endpoints are located at `https://platform.climate.com` (e.g.\n`https://platform.climate.com/v4/fields`).\n\n* The authorization token endpoint is located at\n`https://api.climate.com/api/oauth/token`.\n\n## Troubleshooting\n\n`X-Http-Request-Id` response header will be returned on every call,\nsuccessful or not. If you experience an issue with our api and need\nto contact technical support, please supply the value of the `X-Http-Request-Id`\nheader along with an approximate time of when the request was made.\n\n## Request Limits\n\nWhen you’re onboarded to Climate’s API platform, your `x-api-key` is assigned a custom usage plan. Usage plans are unique to each partner and have the following key attributes: \n\n1. Throttling information\n    * burstLimit: Maximum rate limit over a period ranging from 1 second to a few seconds\n    * rateLimit: A steady-state rate limit\n\n2. Quota information\n    * Limit: The maximum number of requests that can be made in a given month\n\nWhen the request rate threshold is exceeded, a `429` response code is returned. Optionally, the [`Retry-After`](https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.37) header may be returned: \n\nFollowing are examples of rate limit errors:\n\n1. Rate limit exceeded:\n\n<br>HTTP/1.1 429 \n<br>Content-Type: application/json\n<br>Content-Length: 32\n\n   {\"message\":\"Too Many Requests\"}\n\n2. Quota exhausted:\n<br>HTTP/1.1 429 \n<br>Content-Type: application/json\n<br>Content-Length: 29\n\n    {\"message\":\"Limit Exceeded\"}\n\n## Pagination\n\nPagination is performed via headers. Any request which returns a `\"results\"`\narray may be paginated. The following figure shows how query results are laid out with\nX-Limit=4 and no filter applied.\n\n<img style=\"width:70%;height:auto;\" src=\"https://s3-us-west-2.amazonaws.com/climate-com/images/svg_upload_tests/paging.png\">\n\n* If there are no results, a response code of `304` will be returned.\n\n* If the response is the last set of results, a response code of `200` or\n`206` will be returned.\n\n* If there are more results, a response code of `206` will be returned.\n\n* If `X-Next-Token` is provided in the request headers but the token has\nexpired, a response code of `409` will be returned. This is only applicable\nfor some endpoints; see specific endpoint documentation below.\n\n#### X-Limit\n\nThe page size can be controlled with the `X-Limit` header. Valid values are\n`1-100` and defaults to `100`.\n\n#### X-Next-Token\n\nIf the results are paginated, a response header of `X-Next-Token` will be\nreturned. Use the associated value in the subsequent request (via the `X-Next-Token`\nrequest header) to retrieve the next page. The following sequence diagram shows how to\nuse `X-Next-Token` to fetch all the records.\n\n<img src=\"https://s3-us-west-2.amazonaws.com/climate-com/images/svg_upload_tests/x-next-token.svg\">\n\n\n## Chunked Uploads\n\nUploads larger than `5MiB` (`5242880 bytes`) must be done in `5MiB` chunks\n(with the exception of the final chunk). Each chunk request MUST contain a\n`Content-Range` header specifying the portion of the upload, and a `Content-Type`\nheader specifying binary content type (`application/octet-stream`). Range\nuploads must be contiguous. The maximum upload size is capped at `500MiB` (`524288000 bytes`).\n\n## Chunked Downloads\n\nDownloads larger than `5MiB` (`5242880 bytes`) must be done in `1-5MiB`\nchunks (with the exception of the final chunk, which may be less than `1MiB`).\nEach chunk request MUST contain a `Range` header specifying the requested portion of the download,\nand an `Accept` header specifying binary and json content types  (`application/octet-stream,application/json`)\nor all content types (`*/*`).\n\n## Drivers\n\nIf you need drivers to process agronomic data, download the ADAPT plugin below. We only support the plugin in the Windows environment, minimum is Windows 7 SP1.\n\nFor asPlanted, asHarvested and asApplied data:\n* [ADAPT Plugin](https://dev.fieldview.com/drivers/ClimateADAPTPlugin_latest.exe)\n<br>Release notes can be found [here](https://dev.fieldview.com/drivers/adapt-release-notes.txt).\n<br>Download and use of the ADAPT plugin means that you agree to the EULA for use of the ADAPT plugin. \n<br>Please review the [EULA](https://dev.fieldview.com/EULA/ADAPT%20Plugin%20EULA-06-19.pdf) (last updated on June 6th, 2019) before download and use of the ADAPT plugin.\n<br>For more information, please refer to:\n  * [ADAPT Resources](https://adaptframework.org/)\n  * [ADAPT Overview](https://aggateway.atlassian.net/wiki/spaces/ADM/overview)\n  * [ADAPT FAQ](https://aggateway.atlassian.net/wiki/spaces/ADM/pages/165942474/ADAPT+Frequently-Asked+Questions+FAQ)\n  * [ADAPT Videos](https://adaptframework.org/adapt-videos/)\n\n## Sample Test Data\n\nSample agronomic data:\n* [asPlanted and asHarvested data](https://dev.fieldview.com/sample-agronomic-data/Planting_Harvesting_data_04_18_2018_21_46_18.zip)\n* [asApplied data set 1](https://dev.fieldview.com/sample-agronomic-data/as-applied-data1.zip)\n* [asApplied data set 2](https://dev.fieldview.com/sample-agronomic-data/as-applied-data2.zip)\n<br>To upload the sample data to your account, please follow the instructions in this [link](https://support.climate.com/kt#/kA02A000000AaxzSAC/en_US).\n\nSample soil data:\n* [Sample soil data](https://dev.fieldview.com/sample-soil-data/soil-sample.xml)\n---\n"
+  contact:
+    name: Climate FieldView Support
+    email: developer@climate.com
+  version: 4.0.11
+servers:
+- url: https://platform.climate.com/
+tags:
+- name: Exports
+  description: General data export endpoints.
+paths:
+  /v4/exports:
+    post:
+      summary: Initiate a new export request.
+      description: "Step one in requesting a data product. The method will return an **Export** ID which the caller will use in subsequent `GET` requests.\nThe following `contentTypes` may be requested:\n  * __application/vnd.climate.acrsi.geojson__ (Beta)\n     Exports the planting activities accessible by the authenticated user and optionally filtered by resource owner\n     as a [GeoJSON Feature Collection](https://tools.ietf.org/html/rfc7946#page-12).\n\n     The export request definition must contain the following properties:\n       * plantingStartDate\n       * plantingEndDate\n       * resourceOwnerId\n\n     Requires `exports:read` and `plantingActivitySummary:read` scope.\n  \n  * __application/vnd.climate.harvest.geojson__\n     Exports the harvesting activities accessible by the authenticated user and optionally filtered by resource owner\n     as a [GeoJSON Feature Collection](https://tools.ietf.org/html/rfc7946#page-12).\n\n     The export request definition must contain the following properties:\n       * harvestStartDate\n       * harvestEndDate\n       * resourceOwnerId\n\n     Requires `exports:read` and `plantingActivitySummary:read` scope.\n  \n  * __application/vnd.climate.yield-analysis.pdf__\n     Exports a PDF Yield Analysis Report (also called Harvest Summary Report) for all the fields in all the harvest seasons of the given year. If no year definition is provided then the current year is used.\n\n     The export request definition can contain the following properties:\n       * year\n\n     Requires `exports:read` and `reports:read` scope.\n\n  * __application/vnd.climate.yield-analysis.json__\n     Exports a JSON Yield Analysis Report (also called Harvest Summary Report) for all the fields in all the harvest seasons of the given year. If no year definition is provided then the current year is used.\n\n     The export request definition can contain the following properties:\n       * year\n\n     Requires `exports:read` and `reports:read` scope."
+      operationId: postExport
+      tags:
+      - Exports
+      security:
+      - api_key: []
+      - oauth2_authorization_code:
+        - exports:read
+      responses:
+        '201':
+          $ref: '#/components/responses/PostExportOk'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '429':
+          $ref: '#/components/responses/429'
+        '500':
+          $ref: '#/components/responses/500'
+        '503':
+          $ref: '#/components/responses/503'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Export'
+  /v4/exports/{exportId}/status:
+    get:
+      summary: Retrieve the status of an Export.
+      description: Check the status of an **Export** by ID.
+      operationId: fetchExportStatusById
+      tags:
+      - Exports
+      security:
+      - api_key: []
+      - oauth2_authorization_code:
+        - exports:read
+      parameters:
+      - $ref: '#/components/parameters/ExportId'
+      responses:
+        '200':
+          $ref: '#/components/responses/FetchExportStatusByIdOk'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '429':
+          $ref: '#/components/responses/429'
+        '500':
+          $ref: '#/components/responses/500'
+        '503':
+          $ref: '#/components/responses/503'
+  /v4/exports/{exportId}/contents:
+    get:
+      summary: Retrieve the binary contents of a processed export request.
+      description: Downloads larger than `5MiB` (`5242880 bytes`) in size must be downloaded in chunks no larger than `5MiB` (`5242880 bytes`) and no smaller than `1MiB` (`1048576 bytes`). The last chunk could be less than `1MiB` (`1048576 bytes`).
+      operationId: fetchExportContentsById
+      tags:
+      - Exports
+      security:
+      - api_key: []
+      - oauth2_authorization_code:
+        - exports:read
+      parameters:
+      - $ref: '#/components/parameters/Accept'
+      - $ref: '#/components/parameters/ExportId'
+      - $ref: '#/components/parameters/Range'
+      responses:
+        '204':
+          $ref: '#/components/responses/204'
+        '206':
+          $ref: '#/components/responses/FetchExportContentsByIdPartial'
+        '304':
+          $ref: '#/components/responses/304'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '409':
+          $ref: '#/components/responses/ReportConflict'
+        '410':
+          $ref: '#/components/responses/ReportGone'
+        '416':
+          $ref: '#/components/responses/416'
+        '429':
+          $ref: '#/components/responses/429'
+        '500':
+          $ref: '#/components/responses/500'
+        '503':
+          $ref: '#/components/responses/503'
+components:
+  responses:
+    PostExportOk:
+      description: OK
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CreatedExport'
+    '204':
+      description: No Content
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+    '416':
+      description: Range Not Satisfiable
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    FetchExportContentsByIdPartial:
+      description: Partial Result
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+        Content-Range:
+          description: Byte range `bytes start-end/total` (https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.16). e.g. bytes 0-5242879/10242880. Downloads larger than 5MiB (5242880 bytes) in size must be downloaded in chunks no larger than 5MiB (5242880 bytes) and no smaller than 1MiB (1048576 bytes). The last chunk could be less than 1MiB (1048576 bytes).
+          schema:
+            type: string
+      content:
+        application/octet-stream:
+          schema:
+            $ref: '#/components/schemas/ExportContents'
+    '304':
+      description: Not Modified
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+        X-Next-Token:
+          description: A token which may be used to poll for updates.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Empty'
+    FetchExportStatusByIdOk:
+      description: OK
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ExportStatus'
+    '401':
+      description: Unauthorized
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    ReportConflict:
+      description: Conflict (Report generation is still in progress)
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '404':
+      description: Not Found
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    ReportGone:
+      description: Gone (Report is expired)
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '429':
+      description: Too Many Requests
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '403':
+      description: Forbidden
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '503':
+      description: Server Busy
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+        Retry-After:
+          description: Number of seconds to wait before retrying the request.
+          schema:
+            type: integer
+            format: int32
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '400':
+      description: Bad Input
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '500':
+      description: Internal Server Error
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  schemas:
+    BinaryData:
+      description: Binary contents
+      type: string
+      format: binary
+    CreatedExport:
+      type: object
+      required:
+      - id
+      properties:
+        id:
+          description: Unique identifier for the export.
+          type: string
+          format: uuid
+    ExportContents:
+      required:
+      - body
+      properties:
+        body:
+          $ref: '#/components/schemas/BinaryData'
+    Empty:
+      type: object
+    Export:
+      type: object
+      description: Client request to export data from a user.
+      required:
+      - contentType
+      properties:
+        contentType:
+          type: string
+          enum:
+          - application/vnd.climate.acrsi.geojson
+          - application/vnd.climate.harvest.geojson
+          format: mime-type
+          description: Content type representing data being exported (e.g. application/vnd.climate.acrsi.geojson).
+        definition:
+          type: object
+          description: Additional specifications for a client's data export request, dependent on the content type.
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          required:
+          - id
+          - code
+          - message
+          properties:
+            id:
+              type: string
+              format: uuid
+            code:
+              type: string
+            message:
+              type: string
+              description: Description of the error encountered.
+    ExportStatus:
+      type: object
+      required:
+      - status
+      properties:
+        status:
+          description: "Current status of the export request:\n  * `PROCESSING` - Export request has been received by Climate and is being processed.\n  * `INVALID` - Export request has failed validity check.\n  * `EXPIRED` - Export contents have expired, and are no longer available for retrieval.\n  * `COMPLETED` - The export request has been successfully processed, and its contents are available for retrieval.\n  * `NO_DATA` - The export request completed successfully but generated no data.\n"
+          type: string
+          enum:
+          - PROCESSING
+          - INVALID
+          - EXPIRED
+          - COMPLETED
+          - NO_DATA
+        error:
+          description: Message indicating reason for validation failure.
+          type: string
+        size:
+          description: Size of the export's contents in bytes.
+          type: integer
+          format: int64
+        checksum:
+          description: Base64 encoded MD5 hash of the export's contents.
+          type: string
+        xNextToken:
+          description: 'Token which may be used when executing an identical export in
+
+            the future, but which only wants export data which was not
+
+            previously exported.
+
+            Assume a given field export request matches 12 fields today. And
+
+            tomorrow it matches 15 fields. By passing the xNextToken in the
+
+            definition section of tomorrow''s field export request, only the
+
+            3 additional fields would be exported. Note, all other parameters
+
+            passed in the definition section must be identical to the original
+
+            request.
+
+            '
+          type: string
+  parameters:
+    Range:
+      in: header
+      name: Range
+      description: Byte range `bytes=start-end` (https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.35.1). e.g. bytes=0-1048576. Currently only single range value is supported. Both start and end need to be specified, end value should be greater than start and end - start should not be greater than 5MiB.
+      required: true
+      schema:
+        type: string
+    ExportId:
+      in: path
+      description: Unique identifier of an Export.
+      name: exportId
+      required: true
+      schema:
+        type: string
+        format: uuid
+    Accept:
+      in: header
+      name: Accept
+      required: true
+      description: Must be either \*/* or application/octet-stream,application/json
+      schema:
+        type: string
+  securitySchemes:
+    oauth2_authorization_code:
+      description: 'Log in with FieldView OAuth2 provider (Authorization Code Grant). Used to authorize the client (partner) and
+
+        user. The *access_token* is required to be provided in the `Authorization` header on all calls to the FieldView
+
+        APIs with the following format `Bearer $access_token`.'
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://climate.com/static/app-login/
+          tokenUrl: https://api.climate.com/api/oauth/token
+          scopes:
+            platform: (DEPRECATED) Legacy scope used for some Platform APIs
+            fields:read: Required for retrieving field and boundary information
+            farmOrganizations:read: Required for retrieving farm organization information
+            operations:read: Required for retrieving operation information
+            resourceOwners:read: Required for retrieving resource owner information
+            scouting:read: Required for retrieving user\'s scouting information
+            exports:read: Required for requesting or retrieving exports
+            fields:write: Required for uploading field boundaries
+            imagery:write: Required for uploading imagery
+            rx:write: Required for uploading prescriptions
+            soil:write: Required for uploading soil sample results
+            asApplied:read: Required for retrieving as applied data
+            asApplied:write: Required for uploading application data
+            asPlanted:read: Required for retrieving planting data
+            asPlanted:write: Required for uploading planting data
+            asHarvested:read: Required for retrieving harvest data
+            asHarvested:write: Required for uploading harvest data
+            diagnostics:read: Required for retrieving CNH machine diagnostic data
+            plantingActivitySummary:read: Required for retrieving planting activity summary data
+            customerInsights:read: Required for retrieving customer insights metrics data
+            avroAgronomicData:read: Required for retrieving agronomic data
+    api_key:
+      description: 'API access key used to control throttling (429 responses).  This key is typically formatted:
+
+        `partner-{name}-{uuid}`'
+      type: apiKey
+      name: X-Api-Key
+      in: header
+x-amazon-apigateway-api-key-source: AUTHORIZER
