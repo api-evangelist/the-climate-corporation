@@ -1,0 +1,39 @@
+generated: '2026-07-21'
+method: searched
+source: >-
+  https://dev.fieldview.com/technical-documentation/ ,
+  https://dev.fieldview.com/technical-documentation/next-versions/ , and the
+  Platform OpenAPI (openapi/the-climate-corporation-platform-openapi-original.yml).
+versioning:
+  scheme: uri-path
+  current: v4
+  current_version: 4.0.11
+  last_modified: '2025-12-08'
+  docs: https://dev.fieldview.com/technical-documentation/
+preview:
+  version: v5
+  status: preview / next-versions
+  docs: https://dev.fieldview.com/technical-documentation/next-versions/
+  spec: https://dev.fieldview.com/openapi/next-versions.yaml
+  note: >-
+    A v5 preview surface is published (fields, resourceOwners, enrollments,
+    experiments, connections, growingSeasons, planting/harvest/application
+    reports, prescription exports). It is not yet the stable version.
+deprecation:
+  policy_url: null
+  sunset_header: false
+  note: >-
+    No formal deprecation policy or RFC 8594 Sunset/Deprecation header support
+    is documented. The OAuth2 "platform" scope is marked DEPRECATED in the spec
+    as a legacy catch-all scope, superseded by resource-specific scopes.
+  deprecated_scopes:
+    - platform
+sla:
+  url: null
+  note: No public SLA / uptime target published on the developer portal.
+status_page: null
+support:
+  email: fieldview.developer@bayer.com
+  partner_contact: partner@climate.com
+  knowledge_base: https://support.climate.com/
+deprecated_operations: []

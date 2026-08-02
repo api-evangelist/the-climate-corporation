@@ -1,0 +1,413 @@
+generated: '2026-07-21'
+method: generated
+source: openapi/the-climate-corporation-platform-openapi-original.yml
+description: Recommended x-agentic-access execution contracts, classified heuristically from
+  the OpenAPI. A governance starting point for exposing this API to AI agents — review and bind
+  audience per deployment. See research/curity/agentic-governance/.
+summary:
+  operations: 28
+  by_action_class:
+    connected: 22
+    acting: 6
+  by_consequence:
+    read: 22
+    write: 6
+  human_in_the_loop_required: 0
+operations:
+- path: /v4/fields
+  method: get
+  operationId: fetchFields
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    scope:
+    - fields:read
+    - platform
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /v4/fields/{fieldId}
+  method: get
+  operationId: fetchFieldById
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    scope:
+    - fields:read
+    - platform
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /v4/farmOrganizations/{farmOrganizationType}/{farmOrganizationId}
+  method: get
+  operationId: fetchFarmOrganizationByTypeAndId
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    scope:
+    - farmOrganizations:read
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /v4/operations/all
+  method: get
+  operationId: fetchOperations
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    scope:
+    - operations:read
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /v4/resourceOwners/{resourceOwnerId}
+  method: get
+  operationId: getResourceOwner
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    scope:
+    - platform
+    - resourceOwners:read
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /v4/boundaries/{boundaryId}
+  method: get
+  operationId: fetchBoundaryById
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    scope:
+    - fields:read
+    - platform
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /v4/boundaries/query
+  method: post
+  operationId: fetchBoundaries
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    scope:
+    - fields:read
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- path: /v4/boundaries
+  method: post
+  operationId: uploadBoundary
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    scope:
+    - boundaries:write
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- path: /v4/uploads
+  method: post
+  operationId: postUpload
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    scope:
+    - asApplied:write
+    - asHarvested:write
+    - asPlanted:write
+    - fields:write
+    - imagery:write
+    - platform
+    - rx:write
+    - standCount:write
+    - weedCount:write
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- path: /v4/uploads/{uploadId}
+  method: put
+  operationId: chunkedUpload
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    scope:
+    - asApplied:write
+    - asHarvested:write
+    - asPlanted:write
+    - fields:write
+    - imagery:write
+    - platform
+    - rx:write
+    - soil:write
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- path: /v4/uploads/{uploadId}/status
+  method: get
+  operationId: fetchUploadStatusById
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    scope:
+    - asApplied:write
+    - asHarvested:write
+    - asPlanted:write
+    - fields:write
+    - imagery:write
+    - platform
+    - rx:write
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /v4/uploads/status/query
+  method: post
+  operationId: fetchUploadStatuses
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    scope:
+    - asApplied:write
+    - asHarvested:write
+    - asPlanted:write
+    - fields:write
+    - imagery:write
+    - platform
+    - rx:write
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- path: /v4/exports
+  method: post
+  operationId: postExport
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    scope:
+    - exports:read
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- path: /v4/exports/{exportId}/status
+  method: get
+  operationId: fetchExportStatusById
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    scope:
+    - exports:read
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /v4/exports/{exportId}/contents
+  method: get
+  operationId: fetchExportContentsById
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    scope:
+    - exports:read
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /v4/layers/scoutingObservations
+  method: get
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    scope:
+    - platform
+    - scouting:read
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /v4/layers/scoutingObservations/{scoutingObservationId}
+  method: get
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    scope:
+    - platform
+    - scouting:read
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /v4/layers/scoutingObservations/{scoutingObservationId}/attachments
+  method: get
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    scope:
+    - platform
+    - scouting:read
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /v4/layers/scoutingObservations/{scoutingObservationId}/attachments/{attachmentId}/contents
+  method: get
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    scope:
+    - platform
+    - scouting:read
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /v4/layers/asPlanted
+  method: get
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    scope:
+    - asPlanted:read
+    - platform
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /v4/layers/asPlanted/{activityId}/contents
+  method: get
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    scope:
+    - asPlanted:read
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /v4/layers/asPlanted/{activityId}
+  method: get
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    scope:
+    - asPlanted:read
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /v4/layers/asApplied
+  method: get
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    scope:
+    - asApplied:read
+    - platform
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /v4/layers/asApplied/{activityId}/contents
+  method: get
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    scope:
+    - asApplied:read
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /v4/layers/asApplied/{activityId}
+  method: get
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    scope:
+    - asApplied:read
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /v4/layers/asHarvested
+  method: get
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    scope:
+    - asHarvested:read
+    - platform
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /v4/layers/asHarvested/{activityId}/contents
+  method: get
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    scope:
+    - asHarvested:read
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /v4/layers/asHarvested/{activityId}
+  method: get
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    scope:
+    - asHarvested:read
+    token:
+      max-ttl: 3600
+    audit: none

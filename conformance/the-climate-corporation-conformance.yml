@@ -1,0 +1,49 @@
+generated: '2026-07-21'
+method: derived
+source: >-
+  Derived from openapi/the-climate-corporation-platform-openapi-original.yml and
+  https://dev.fieldview.com/api-details/. Asserts cross-cutting standards
+  conformance only; no published compliance-certification program (SOC 2 / ISO
+  27001 / etc.) was found for the developer platform, so no Compliance pointer
+  is emitted.
+standards:
+  - id: oauth2
+    conforms: true
+    evidence: >-
+      OpenAPI securityScheme oauth2_authorization_code (RFC 6749 authorization
+      code + refresh_token grants); documented at dev.fieldview.com/api-details.
+  - id: oauth2-authorization-code
+    conforms: true
+    evidence: authorizationUrl climate.com/static/app-login + tokenUrl api.climate.com/api/oauth/token
+  - id: bearer-token
+    conforms: true
+    evidence: Authorization Bearer $access_token on all calls
+  - id: api-key
+    conforms: true
+    evidence: X-Api-Key header required on all calls (throttling/usage plan)
+  - id: tls
+    conforms: true
+    evidence: All endpoints HTTPS only; TLS 1.2 per api-details security section
+  - id: oidc
+    conforms: false
+    evidence: No OpenID Connect discovery or id_token; OAuth2 authorization only
+  - id: rfc9457-problem-details
+    conforms: false
+    evidence: 'Errors use a flat {"message": ...} envelope, not application/problem+json'
+  - id: rfc8594-sunset-header
+    conforms: false
+    evidence: No Sunset/Deprecation header support documented
+  - id: pagination
+    conforms: true
+    evidence: Header-based cursor pagination (X-Limit / X-Next-Token / X-Next-Uri, 206/304)
+  - id: idempotency
+    conforms: false
+    evidence: No idempotency-key mechanism documented
+  - id: geojson
+    conforms: true
+    evidence: Field & Boundary format is GeoJSON-based (dev.fieldview.com/field-boundary-format)
+  - id: adapt
+    conforms: true
+    evidence: >-
+      Agronomic data interchange aligns with the ADAPT framework (referenced in
+      the OpenAPI description and sample data guidance).

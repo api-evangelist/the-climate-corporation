@@ -1,0 +1,33 @@
+generated: '2026-07-21'
+method: probed
+source: live probe of /.well-known/* on Climate FieldView / Climate hosts (2026-07-21)
+description: >-
+  Probe of the /.well-known/ discovery surface. No machine-readable discovery
+  documents are published: dev.fieldview.com and climate.com return 404 for
+  every probed path, and the API gateway host platform.climate.com returns 403
+  (it requires a valid X-Api-Key on every path, including /.well-known/). No
+  security.txt and no OIDC/OAuth authorization-server metadata are published;
+  Climate FieldView's OAuth2 is documented at dev.fieldview.com/api-details
+  rather than via discovery. Absence is recorded as valid data; no WellKnown or
+  SecurityTxt rating pointer is emitted.
+hosts:
+  - host: https://platform.climate.com
+    note: API gateway — 403 (X-Api-Key required) on all paths
+    documents:
+      - {path: /.well-known/security.txt, status: 403}
+      - {path: /.well-known/openid-configuration, status: 403}
+      - {path: /.well-known/oauth-authorization-server, status: 403}
+      - {path: /.well-known/api-catalog, status: 403}
+      - {path: /.well-known/ai-plugin.json, status: 403}
+  - host: https://dev.fieldview.com
+    documents:
+      - {path: /.well-known/security.txt, status: 404}
+      - {path: /.well-known/openid-configuration, status: 404}
+      - {path: /.well-known/oauth-authorization-server, status: 404}
+      - {path: /.well-known/api-catalog, status: 404}
+      - {path: /.well-known/ai-plugin.json, status: 404}
+  - host: https://climate.com
+    documents:
+      - {path: /.well-known/security.txt, status: 404}
+      - {path: /.well-known/openid-configuration, status: 404}
+      - {path: /.well-known/oauth-authorization-server, status: 404}

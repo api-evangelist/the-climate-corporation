@@ -1,0 +1,34 @@
+generated: '2026-07-21'
+method: searched
+source: >-
+  Sample Test Data section of the Climate FieldView Platform OpenAPI description
+  (openapi/the-climate-corporation-platform-openapi-original.yml) and
+  dev.fieldview.com. Climate FieldView has no separate test/live key split; a
+  Climate employee issues real OAuth2 client credentials + X-Api-Key during
+  onboarding. What is published for testing is downloadable sample agronomic and
+  soil datasets you upload into your own account to exercise the upload/export
+  and layer-retrieval flows.
+test_vs_live:
+  model: >-
+    No sandbox key prefix. The same OAuth2 client_id/client_secret and X-Api-Key
+    are used against production; there is no dedicated test environment. Test by
+    uploading the published sample datasets into a real account.
+sample_datasets:
+  - name: asPlanted and asHarvested data
+    url: https://dev.fieldview.com/sample-agronomic-data/Planting_Harvesting_data_04_18_2018_21_46_18.zip
+    type: as-planted / as-harvested
+  - name: asApplied data set 1
+    url: https://dev.fieldview.com/sample-agronomic-data/as-applied-data1.zip
+    type: as-applied
+  - name: asApplied data set 2
+    url: https://dev.fieldview.com/sample-agronomic-data/as-applied-data2.zip
+    type: as-applied
+  - name: Sample soil data
+    url: https://dev.fieldview.com/sample-soil-data/soil-sample.xml
+    type: soil-sample-results
+upload_instructions: https://support.climate.com/kt#/kA02A000000AaxzSAC/en_US
+notes: >-
+  Data uploads are asynchronous: POST /v4/uploads to start, chunk content via
+  PUT /v4/uploads/{uploadId}, then poll /v4/uploads/{uploadId}/status. Never
+  invent client credentials or API keys — they are issued per partner during
+  onboarding (fieldview.developer@bayer.com / partner@climate.com).

@@ -1,0 +1,40 @@
+# The Climate Corporation (Climate FieldView Platform)
+
+> The Climate Corporation (Climate LLC, a Bayer company) operates Climate FieldView, one of the largest digital agriculture platforms, covering 120M+ acres. The FieldView Platform APIs let partners read and write growers' field boundaries, agronomic layers (as-planted, as-applied, as-harvested), scouting observations, farm organizations, and operations, and run bulk uploads and exports — all with the grower's OAuth2 consent.
+
+Base URL: https://platform.climate.com (v4; e.g. https://platform.climate.com/v4/fields). Auth: OAuth2 authorization_code bearer token (token endpoint https://api.climate.com/api/oauth/token) PLUS a required X-Api-Key header on every call. A v5 surface is in preview.
+
+## APIs
+- [Climate FieldView Platform API (v4)](https://dev.fieldview.com/technical-documentation/): Fields, Boundaries, Uploads, Exports, Layers, ResourceOwners, FarmOrganizations, Operations.
+- [Next API Versions (v5 preview)](https://dev.fieldview.com/technical-documentation/next-versions/): fields, enrollments, experiments, connections, growing seasons, planting/harvest/application reports, prescription exports.
+
+## Specs
+- [Platform OpenAPI (v4.0.11)](https://dev.fieldview.com/openapi/platform.yaml)
+- [v5 preview OpenAPI](https://dev.fieldview.com/openapi/next-versions.yaml)
+
+## Docs
+- [Developer Portal](https://dev.fieldview.com/)
+- [Technical Documentation / API Reference](https://dev.fieldview.com/technical-documentation/)
+- [FieldView OAuth2 Overview](https://dev.fieldview.com/api-details/)
+- [Enrollments API](https://dev.fieldview.com/enrollments-details/)
+- [Field & Boundary Format](https://dev.fieldview.com/field-boundary-format)
+- [Seeding Prescription (Rx) Format](https://dev.fieldview.com/rx-format)
+- [Soil Sample Results Format](https://dev.fieldview.com/soil-format)
+- [Non-satellite Imagery Formats](https://dev.fieldview.com/non-satellite-imagery-formats)
+- [FAQ](https://dev.fieldview.com/faq/)
+- [API Example (GitHub)](https://github.com/TheClimateCorporation/api-example)
+
+## Enrichment artifacts
+- Authentication: authentication/the-climate-corporation-authentication.yml
+- OAuth scopes: scopes/the-climate-corporation-scopes.yml
+- Conventions: conventions/the-climate-corporation-conventions.yml
+- Errors: errors/the-climate-corporation-problem-types.yml
+- Lifecycle: lifecycle/the-climate-corporation-lifecycle.yml
+- Data model: data-model/the-climate-corporation-data-model.yml
+- Agentic access: agentic-access/the-climate-corporation-agentic-access.yml
+- MCP (candidate): mcp/the-climate-corporation-mcp.yml
+- Sandbox / sample data: sandbox/the-climate-corporation-sandbox.yml
+
+## Contact
+- Developer support: fieldview.developer@bayer.com
+- Partner/business: partner@climate.com

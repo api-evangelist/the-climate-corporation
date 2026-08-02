@@ -1,0 +1,27 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements for Climate FieldView Platform APIs
+  version: 1.0.0
+extends: openapi/the-climate-corporation-platform-openapi-original.yml
+actions:
+  - target: $.info
+    update:
+      x-apievangelist-enriched: '2026-07-21'
+      x-api-evangelist-provider: the-climate-corporation
+      x-base-url: https://platform.climate.com
+      x-token-endpoint: https://api.climate.com/api/oauth/token
+      x-api-key-header: X-Api-Key
+      x-error-envelope: '{"message": "<reason>"}'
+      x-pagination: header-based (X-Limit / X-Next-Token / X-Next-Uri; 206/304)
+      x-request-id-header: X-Http-Request-Id
+      x-idempotency: not-supported
+  - target: $.info
+    update:
+      x-artifacts:
+        authentication: authentication/the-climate-corporation-authentication.yml
+        scopes: scopes/the-climate-corporation-scopes.yml
+        conventions: conventions/the-climate-corporation-conventions.yml
+        errors: errors/the-climate-corporation-problem-types.yml
+        lifecycle: lifecycle/the-climate-corporation-lifecycle.yml
+        data-model: data-model/the-climate-corporation-data-model.yml
+        agentic-access: agentic-access/the-climate-corporation-agentic-access.yml

@@ -1,0 +1,102 @@
+generated: '2026-07-21'
+method: derived
+source: >-
+  Derived from openapi/the-climate-corporation-platform-openapi-original.yml
+  (paths, path parameters, tags) and the Field & Boundary / agronomic data
+  formats documented at dev.fieldview.com. Entity graph of the Climate FieldView
+  Platform v4 API.
+entities:
+  - name: Field
+    id: fieldId
+    tag: Fields
+    description: A named agricultural field; the core spatial unit.
+    endpoints:
+      - '/v4/fields'
+      - '/v4/fields/{fieldId}'
+  - name: Boundary
+    id: boundaryId
+    tag: Boundaries
+    description: GeoJSON field boundary geometry associated with a Field.
+    endpoints:
+      - '/v4/boundaries'
+      - '/v4/boundaries/{boundaryId}'
+      - '/v4/boundaries/query'
+  - name: FarmOrganization
+    id: farmOrganizationId
+    tag: FarmOrganizations
+    description: A farm organization (grouping of fields/operations), keyed by type + id.
+    endpoints:
+      - '/v4/farmOrganizations/{farmOrganizationType}/{farmOrganizationId}'
+  - name: ResourceOwner
+    id: resourceOwnerId
+    tag: ResourceOwners
+    description: The FieldView user/account that owns the data resources.
+    endpoints:
+      - '/v4/resourceOwners/{resourceOwnerId}'
+  - name: Operation
+    id: operationId
+    tag: Operations
+    description: A field operation (planting, application, harvest activity record).
+    endpoints:
+      - '/v4/operations/all'
+  - name: Upload
+    id: uploadId
+    tag: Uploads
+    description: An asynchronous data upload job (as-planted/harvested/applied, imagery, rx, soil, boundaries).
+    endpoints:
+      - '/v4/uploads'
+      - '/v4/uploads/{uploadId}'
+      - '/v4/uploads/{uploadId}/status'
+      - '/v4/uploads/status/query'
+  - name: Export
+    id: exportId
+    tag: Exports
+    description: An asynchronous data export job.
+    endpoints:
+      - '/v4/exports'
+      - '/v4/exports/{exportId}/status'
+      - '/v4/exports/{exportId}/contents'
+  - name: Layer
+    id: activityId
+    tag: Layers
+    description: >-
+      Agronomic data layers retrieved by activity (asPlanted, asApplied,
+      asHarvested) and scouting observations with attachments.
+    endpoints:
+      - '/v4/layers/asPlanted'
+      - '/v4/layers/asApplied'
+      - '/v4/layers/asHarvested'
+      - '/v4/layers/scoutingObservations'
+relationships:
+  - from: Boundary
+    to: Field
+    type: belongs_to
+    via: fieldId
+  - from: Field
+    to: ResourceOwner
+    type: belongs_to
+    via: resourceOwnerId
+  - from: Field
+    to: FarmOrganization
+    type: belongs_to
+    via: farmOrganizationId
+  - from: Operation
+    to: Field
+    type: belongs_to
+    via: fieldId
+  - from: Layer
+    to: Field
+    type: belongs_to
+    via: fieldId
+  - from: Layer
+    to: Operation
+    type: belongs_to
+    via: activityId
+  - from: Upload
+    to: Field
+    type: has_many
+    via: fieldId
+  - from: Export
+    to: Field
+    type: has_many
+    via: fieldId

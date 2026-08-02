@@ -1,0 +1,102 @@
+generated: '2026-07-21'
+method: searched
+source: >-
+  https://dev.fieldview.com/api-details/ and the Climate FieldView Platform
+  OpenAPI (openapi/the-climate-corporation-platform-openapi-original.yml,
+  v4.0.11). Cross-cutting request/response semantics that apply across every
+  Climate FieldView Platform API operation.
+description: >-
+  How the Climate FieldView Platform REST APIs behave across every operation:
+  OAuth2 bearer authentication plus a mandatory X-Api-Key throttling key,
+  URI-path versioning (/v4, with /v5 in preview), header-based pagination, the
+  X-Http-Request-Id trace header returned on every response, rate-limit
+  signaling via 429 + Retry-After, and the flat {"message": ...} error envelope.
+  These are the developer-experience / runtime-semantics conventions that
+  OpenAPI does not fully express. No documented idempotency-key mechanism was
+  found, so no Idempotency contract is asserted.
+
+base_url: https://platform.climate.com
+api_style: REST over HTTPS (TLS 1.2), JSON responses
+
+versioning:
+  scheme: uri-path
+  current: v4
+  current_example: https://platform.climate.com/v4/fields
+  preview: v5
+  preview_docs: https://dev.fieldview.com/technical-documentation/next-versions/
+  docs: https://dev.fieldview.com/technical-documentation/
+
+authentication:
+  scheme: >-
+    OAuth2 authorization_code bearer token AND a required X-Api-Key header on
+    every call. Both must be present.
+  bearer:
+    header: Authorization
+    format: 'Bearer $access_token'
+    token_endpoint: https://api.climate.com/api/oauth/token
+    token_endpoint_auth: HTTP Basic base64(clientId:clientSecret)
+    access_token_ttl: 4 hours
+    refresh_token_ttl: 30 days (single-use)
+  api_key:
+    header: X-Api-Key
+    required: true
+    purpose: throttling / usage-plan enforcement and usage metrics
+    missing_or_invalid: '403 {"message": "Forbidden"}'
+  docs: https://dev.fieldview.com/api-details/
+  cross_ref: authentication/the-climate-corporation-authentication.yml
+
+pagination:
+  style: header-based (cursor via next-token)
+  request_headers:
+    - name: X-Limit
+      description: Maximum number of results to return in the page
+    - name: X-Next-Token
+      description: Opaque cursor token from a prior response to fetch the next page
+  response_headers:
+    - name: X-Next-Token
+      description: Cursor token to pass on the subsequent request for more results
+    - name: X-Next-Uri
+      description: Convenience URI for the next page of results
+  status_codes:
+    '200': Full or final set of results
+    '206': Partial content; more results available (or the last page)
+    '304': No results / not modified
+  note: >-
+    Any request that returns a "results" array may be paginated. A 206 indicates
+    there may be more results (continue with X-Next-Token); a 200 or 206 on the
+    final set; a 304 when there are no results.
+
+request_tracing:
+  header: X-Http-Request-Id
+  returned_on: every response (success or error)
+  purpose: >-
+    Supply this value plus the approximate request time to technical support
+    (fieldview.developer@bayer.com) when reporting an issue.
+
+rate_limiting:
+  model: per-partner usage plan keyed by X-Api-Key
+  attributes:
+    - burstLimit (short-window peak rate)
+    - rateLimit (steady-state rate)
+    - quota (max requests per month)
+  exceeded_status: 429
+  retry_header: Retry-After
+  bodies:
+    rate_limit_exceeded: '{"message": "Too Many Requests"}'
+    quota_exhausted: '{"message": "Limit Exceeded"}'
+  cross_ref: rate-limits/
+
+error_envelope:
+  format: flat JSON object with a single "message" field (NOT RFC 9457 problem+json)
+  shape: '{"message": "<human readable reason>"}'
+  oauth_token_errors:
+    format: '{"error": "<code>", "error_description": "<text>"}'
+    codes: [invalid_scope, invalid_request, invalid_grant]
+  cross_ref: errors/the-climate-corporation-problem-types.yml
+
+idempotency:
+  supported: false
+  note: >-
+    No Idempotency-Key header or documented idempotent-retry contract was found
+    in the OpenAPI or the developer documentation. Uploads are asynchronous
+    (upload -> status polling) rather than idempotent PUTs.

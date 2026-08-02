@@ -1,0 +1,18 @@
+generated: '2026-07-21'
+method: generated
+source: >-
+  Generated from openapi/the-climate-corporation-platform-openapi-original.yml
+  (v4.0.11). Every step is grounded in a real operationId verified in the spec.
+skills:
+  - file: the-climate-corporation-list-fields-and-boundaries.md
+    name: List a grower's fields and boundaries
+    api: openapi/the-climate-corporation-platform-openapi-original.yml
+    operations: [fetchFields, fetchFieldById, fetchBoundaryById]
+  - file: the-climate-corporation-upload-agronomic-data.md
+    name: Upload agronomic data to FieldView
+    api: openapi/the-climate-corporation-platform-openapi-original.yml
+    operations: [postUpload, chunkedUpload, fetchUploadStatusById]
+  - file: the-climate-corporation-export-field-data.md
+    name: Export FieldView data
+    api: openapi/the-climate-corporation-platform-openapi-original.yml
+    operations: [postExport, fetchExportStatusById, fetchExportContentsById]

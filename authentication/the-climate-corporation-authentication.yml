@@ -1,0 +1,47 @@
+generated: '2026-07-21'
+method: searched
+source: >-
+  openapi/the-climate-corporation-platform-openapi-original.yml (v4.0.11),
+  upgraded from the FieldView OAuth2 Overview at
+  https://dev.fieldview.com/api-details/
+docs: https://dev.fieldview.com/api-details/
+summary:
+  types:
+  - apiKey
+  - oauth2
+  api_key_in:
+  - header
+  oauth2_flows:
+  - authorizationCode
+  required_together: >-
+    Every call requires BOTH a Bearer access_token (OAuth2) AND the X-Api-Key
+    header. Missing token -> 401 {"message":"Unauthorized"}; missing/invalid
+    X-Api-Key -> 403 {"message":"Forbidden"}.
+  token_endpoint_auth: HTTP Basic base64(clientId:clientSecret) on POST https://api.climate.com/api/oauth/token
+  grants: [authorization_code, refresh_token]
+  access_token_ttl: 4 hours
+  refresh_token_ttl: 30 days (single-use)
+  tls: TLS 1.2, HTTPS only
+schemes:
+- name: oauth2_authorization_code
+  type: oauth2
+  flows:
+  - flow: authorizationCode
+    authorizationUrl: https://climate.com/static/app-login/
+    tokenUrl: https://api.climate.com/api/oauth/token
+    scopes: 21
+  description: |-
+    Log in with FieldView OAuth2 provider (Authorization Code Grant). Used to authorize the client (partner) and
+    user. The *access_token* is required to be provided in the `Authorization` header on all calls to the FieldView
+    APIs with the following format `Bearer $access_token`.
+  sources:
+  - openapi/the-climate-corporation-platform-openapi-original.yml
+- name: api_key
+  type: apiKey
+  in: header
+  parameter: X-Api-Key
+  description: |-
+    API access key used to control throttling (429 responses).  This key is typically formatted:
+    `partner-{name}-{uuid}`
+  sources:
+  - openapi/the-climate-corporation-platform-openapi-original.yml

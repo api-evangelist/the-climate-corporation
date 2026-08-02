@@ -1,0 +1,28 @@
+{
+  "provider": "the-climate-corporation",
+  "sources": [
+    "the-climate-corporation-boundaries-api-openapi.yml",
+    "the-climate-corporation-exports-api-openapi.yml",
+    "the-climate-corporation-farmorganizations-api-openapi.yml",
+    "the-climate-corporation-fields-api-openapi.yml",
+    "the-climate-corporation-layers-api-openapi.yml",
+    "the-climate-corporation-operations-api-openapi.yml",
+    "the-climate-corporation-resourceowners-api-openapi.yml",
+    "the-climate-corporation-uploads-api-openapi.yml"
+  ],
+  "outputs": [
+    "the-climate-corporation-boundaries-api-openapi.yml",
+    "the-climate-corporation-exports-api-openapi.yml",
+    "the-climate-corporation-farmorganizations-api-openapi.yml",
+    "the-climate-corporation-fields-api-openapi.yml",
+    "the-climate-corporation-layers-api-openapi.yml",
+    "the-climate-corporation-operations-api-openapi.yml",
+    "the-climate-corporation-resourceowners-api-openapi.yml",
+    "the-climate-corporation-uploads-api-openapi.yml"
+  ],
+  "archived": [],
+  "errors": [],
+  "warnings": [],
+  "notes": [],
+  "skipped": []
+}

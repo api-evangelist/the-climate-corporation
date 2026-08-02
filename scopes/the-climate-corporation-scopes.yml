@@ -1,0 +1,156 @@
+generated: '2026-07-21'
+method: searched
+source: openapi/the-climate-corporation-platform-openapi-original.yml (v4.0.11)
+docs: https://dev.fieldview.com/api-details/
+notes: >-
+  Scopes are resource:action pairs (e.g. fields:read imagery:write), passed
+  space-delimited and URL-encoded on the authorization request. The user is
+  prompted to grant each requested scope. The legacy "platform" scope is
+  deprecated in favor of resource-specific scopes.
+schemes:
+- name: oauth2_authorization_code
+  source: openapi/the-climate-corporation-platform-openapi-original.yml
+  flows:
+  - flow: authorizationCode
+    authorizationUrl: https://climate.com/static/app-login/
+    tokenUrl: https://api.climate.com/api/oauth/token
+  description: |-
+    Log in with FieldView OAuth2 provider (Authorization Code Grant). Used to authorize the client (partner) and
+    user. The *access_token* is required to be provided in the `Authorization` header on all calls to the FieldView
+    APIs with the following format `Bearer $access_token`.
+scopes:
+- scope: asApplied:read
+  description: Required for retrieving as applied data
+  flows:
+  - authorizationCode
+  sources:
+  - openapi/the-climate-corporation-platform-openapi-original.yml
+- scope: asApplied:write
+  description: Required for uploading application data
+  flows:
+  - authorizationCode
+  sources:
+  - openapi/the-climate-corporation-platform-openapi-original.yml
+- scope: asHarvested:read
+  description: Required for retrieving harvest data
+  flows:
+  - authorizationCode
+  sources:
+  - openapi/the-climate-corporation-platform-openapi-original.yml
+- scope: asHarvested:write
+  description: Required for uploading harvest data
+  flows:
+  - authorizationCode
+  sources:
+  - openapi/the-climate-corporation-platform-openapi-original.yml
+- scope: asPlanted:read
+  description: Required for retrieving planting data
+  flows:
+  - authorizationCode
+  sources:
+  - openapi/the-climate-corporation-platform-openapi-original.yml
+- scope: asPlanted:write
+  description: Required for uploading planting data
+  flows:
+  - authorizationCode
+  sources:
+  - openapi/the-climate-corporation-platform-openapi-original.yml
+- scope: avroAgronomicData:read
+  description: Required for retrieving agronomic data
+  flows:
+  - authorizationCode
+  sources:
+  - openapi/the-climate-corporation-platform-openapi-original.yml
+- scope: boundaries:write
+  sources:
+  - openapi/the-climate-corporation-platform-openapi-original.yml
+- scope: customerInsights:read
+  description: Required for retrieving customer insights metrics data
+  flows:
+  - authorizationCode
+  sources:
+  - openapi/the-climate-corporation-platform-openapi-original.yml
+- scope: diagnostics:read
+  description: Required for retrieving CNH machine diagnostic data
+  flows:
+  - authorizationCode
+  sources:
+  - openapi/the-climate-corporation-platform-openapi-original.yml
+- scope: exports:read
+  description: Required for requesting or retrieving exports
+  flows:
+  - authorizationCode
+  sources:
+  - openapi/the-climate-corporation-platform-openapi-original.yml
+- scope: farmOrganizations:read
+  description: Required for retrieving farm organization information
+  flows:
+  - authorizationCode
+  sources:
+  - openapi/the-climate-corporation-platform-openapi-original.yml
+- scope: fields:read
+  description: Required for retrieving field and boundary information
+  flows:
+  - authorizationCode
+  sources:
+  - openapi/the-climate-corporation-platform-openapi-original.yml
+- scope: fields:write
+  description: Required for uploading field boundaries
+  flows:
+  - authorizationCode
+  sources:
+  - openapi/the-climate-corporation-platform-openapi-original.yml
+- scope: imagery:write
+  description: Required for uploading imagery
+  flows:
+  - authorizationCode
+  sources:
+  - openapi/the-climate-corporation-platform-openapi-original.yml
+- scope: operations:read
+  description: Required for retrieving operation information
+  flows:
+  - authorizationCode
+  sources:
+  - openapi/the-climate-corporation-platform-openapi-original.yml
+- scope: plantingActivitySummary:read
+  description: Required for retrieving planting activity summary data
+  flows:
+  - authorizationCode
+  sources:
+  - openapi/the-climate-corporation-platform-openapi-original.yml
+- scope: platform
+  description: (DEPRECATED) Legacy scope used for some Platform APIs
+  flows:
+  - authorizationCode
+  sources:
+  - openapi/the-climate-corporation-platform-openapi-original.yml
+- scope: resourceOwners:read
+  description: Required for retrieving resource owner information
+  flows:
+  - authorizationCode
+  sources:
+  - openapi/the-climate-corporation-platform-openapi-original.yml
+- scope: rx:write
+  description: Required for uploading prescriptions
+  flows:
+  - authorizationCode
+  sources:
+  - openapi/the-climate-corporation-platform-openapi-original.yml
+- scope: scouting:read
+  description: Required for retrieving user\'s scouting information
+  flows:
+  - authorizationCode
+  sources:
+  - openapi/the-climate-corporation-platform-openapi-original.yml
+- scope: soil:write
+  description: Required for uploading soil sample results
+  flows:
+  - authorizationCode
+  sources:
+  - openapi/the-climate-corporation-platform-openapi-original.yml
+- scope: standCount:write
+  sources:
+  - openapi/the-climate-corporation-platform-openapi-original.yml
+- scope: weedCount:write
+  sources:
+  - openapi/the-climate-corporation-platform-openapi-original.yml

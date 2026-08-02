@@ -1,0 +1,65 @@
+generated: '2026-07-21'
+method: derived
+source: >-
+  openapi/the-climate-corporation-platform-openapi-original.yml (4xx/5xx
+  responses) enriched from https://dev.fieldview.com/api-details/ (OAuth2 error
+  reference and the DoS/throttling section).
+format: message-envelope
+envelope: '{"message": "<reason>"}'
+notes: >-
+  Climate FieldView does NOT use RFC 9457 application/problem+json. API errors
+  return a flat JSON object with a single "message" field. OAuth2 token-endpoint
+  errors use the OAuth2 {"error", "error_description"} shape instead. Every
+  response (success or error) also carries an X-Http-Request-Id header for
+  support triage.
+problems:
+  - status: 304
+    title: Not Modified / No Results
+    meaning: The paginated query returned no results.
+    source_operation: openapi/the-climate-corporation-platform-openapi-original.yml
+  - status: 400
+    title: Bad Request
+    meaning: Malformed request, invalid parameters, or invalid OAuth2 grant/scope.
+    body: '{"message": "..."}'
+    source_operation: openapi/the-climate-corporation-platform-openapi-original.yml
+  - status: 401
+    title: Unauthorized
+    meaning: Missing or invalid Authorization (bearer access_token) header.
+    body: '{"message": "Unauthorized"}'
+    source_operation: openapi/the-climate-corporation-platform-openapi-original.yml
+  - status: 403
+    title: Forbidden
+    meaning: Missing or invalid X-Api-Key header.
+    body: '{"message": "Forbidden"}'
+    source_operation: openapi/the-climate-corporation-platform-openapi-original.yml
+  - status: 404
+    title: Not Found
+    meaning: The requested resource (field, operation, farm organization, ...) does not exist.
+    source_operation: openapi/the-climate-corporation-platform-openapi-original.yml
+  - status: 429
+    title: Too Many Requests
+    meaning: Rate limit or monthly quota exceeded for the partner usage plan; honor Retry-After.
+    bodies:
+      - '{"message": "Too Many Requests"}'
+      - '{"message": "Limit Exceeded"}'
+    source_operation: openapi/the-climate-corporation-platform-openapi-original.yml
+  - status: 500
+    title: Internal Server Error
+    meaning: Unexpected server error; retry later and supply X-Http-Request-Id to support.
+    source_operation: openapi/the-climate-corporation-platform-openapi-original.yml
+  - status: 503
+    title: Service Unavailable
+    meaning: The platform is temporarily unavailable; retry later.
+    source_operation: openapi/the-climate-corporation-platform-openapi-original.yml
+oauth_errors:
+  - error: invalid_scope
+    status: 400
+    description: '"Invalid Scope!" - scopes must be space-delimited and URL-encoded.'
+  - error: invalid_request
+    status: 400
+    description: Request body and headers both contain authorization information.
+  - error: invalid_grant
+    status: 400
+    description: >-
+      Inactive/used authorization code, already-used refresh token, or
+      redirect_uri (callback) mismatch.
