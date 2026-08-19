@@ -1,0 +1,529 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Climate FieldView Platform APIs Boundaries Layers API",
+    "version": "4.0.11"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Layers",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Retrieve a list of scouting observations",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://platform.climate.com/v4/layers/scoutingObservations",
+            "headers": [
+              {
+                "name": "X-Next-Token",
+                "value": ""
+              },
+              {
+                "name": "X-Limit",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "occurredAfter",
+                "value": "",
+                "type": "query",
+                "description": "Optional start time by which to filter layer results. Time must be in ISO 8601 format with time zone, e.g. 2016-05-13T00:00:00Z (https://tools.ietf.org/html/rfc3339). Layers with an end time at or after (inclusive) the specified time will match this filter. If both occurredAfter and occurredBefore are populated, occurredAfter must be <= occurredBefore."
+              },
+              {
+                "name": "occurredBefore",
+                "value": "",
+                "type": "query",
+                "description": "Optional end time by which to filter layer results. Time must be in ISO 8601 format with time zone, e.g. 2016-05-13T00:00:00Z (https://tools.ietf.org/html/rfc3339). Layers with a start time at or before (inclusive) the specified time. If both occurredAfter and occurredBefore are populated, occurredAfter must be <= occurredBefore."
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "X-Api-Key",
+              "value": "{{X-Api-Key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Retrieve a list of scouting observations created or updated by the user identified by the Authorization header."
+        },
+        {
+          "info": {
+            "name": "Retrieve individual scouting observation",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://platform.climate.com/v4/layers/scoutingObservations/:scoutingObservationId",
+            "params": [
+              {
+                "name": "scoutingObservationId",
+                "value": "",
+                "type": "path",
+                "description": "Unique identifier of the Scouting Observation."
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "X-Api-Key",
+              "value": "{{X-Api-Key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Retrieve an individual scouting observation by id.  Ids are retrieved via the /layers/scoutingObservations route."
+        },
+        {
+          "info": {
+            "name": "Retrieve attachments associated with a given scouting observation.",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://platform.climate.com/v4/layers/scoutingObservations/:scoutingObservationId/attachments",
+            "headers": [
+              {
+                "name": "X-Next-Token",
+                "value": ""
+              },
+              {
+                "name": "X-Limit",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "scoutingObservationId",
+                "value": "",
+                "type": "path",
+                "description": "Unique identifier of the Scouting Observation."
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "X-Api-Key",
+              "value": "{{X-Api-Key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Retrieve attachments associated with a given scouting observation. Photos added to scouting notes in the FieldView app are capped to 20MB, and we won’t store photos larger than that in a scouting note."
+        },
+        {
+          "info": {
+            "name": "Retrieve the binary contents of a scouting observation’s attachment.",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://platform.climate.com/v4/layers/scoutingObservations/:scoutingObservationId/attachments/:attachmentId/contents",
+            "headers": [
+              {
+                "name": "Accept",
+                "value": ""
+              },
+              {
+                "name": "Range",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "scoutingObservationId",
+                "value": "",
+                "type": "path",
+                "description": "Unique identifier of the Scouting Observation."
+              },
+              {
+                "name": "attachmentId",
+                "value": "",
+                "type": "path",
+                "description": "Unique identifier of the attachment."
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "X-Api-Key",
+              "value": "{{X-Api-Key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Photos added to scouting notes in the FieldView app are capped to `20MiB` (`20971520 bytes`), and we won’t store photos larger than that in a scouting note. Downloads larger than `5MiB` (`5242880 bytes`) in size, must be downloaded in chunks no larger than `5MiB` (`5242880 bytes`) and no smaller than `1MiB` (`1048576 bytes`). The last chunk could be less than `1MiB` (`1048576 bytes`)."
+        },
+        {
+          "info": {
+            "name": "Retrieve a list of planting activities",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://platform.climate.com/v4/layers/asPlanted",
+            "headers": [
+              {
+                "name": "Accept",
+                "value": ""
+              },
+              {
+                "name": "X-Next-Token",
+                "value": ""
+              },
+              {
+                "name": "X-Limit",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "resourceOwnerId",
+                "value": "",
+                "type": "query",
+                "description": "Optional unique identifier of the resource owner.  If resourceOwnerId is not specified, it defaults to the x-authenticated-user-uuid."
+              },
+              {
+                "name": "occurredAfter",
+                "value": "",
+                "type": "query",
+                "description": "Optional start time by which to filter layer results. Time must be in ISO 8601 format with time zone, e.g. 2016-05-13T00:00:00Z (https://tools.ietf.org/html/rfc3339). Layers with an end time at or after (inclusive) the specified time will match this filter. If both occurredAfter and occurredBefore are populated, occurredAfter must be <= occurredBefore."
+              },
+              {
+                "name": "occurredBefore",
+                "value": "",
+                "type": "query",
+                "description": "Optional end time by which to filter layer results. Time must be in ISO 8601 format with time zone, e.g. 2016-05-13T00:00:00Z (https://tools.ietf.org/html/rfc3339). Layers with a start time at or before (inclusive) the specified time. If both occurredAfter and occurredBefore are populated, occurredAfter must be <= occurredBefore."
+              },
+              {
+                "name": "updatedAfter",
+                "value": "",
+                "type": "query",
+                "description": "Optional updated time by which to filter layer results. Time must be in ISO 8601 format with time zone, e.g. 2016-05-13T00:00:00Z (https://tools.ietf.org/html/rfc3339). Layers with a modification time at or after (inclusive) the specified time."
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "X-Api-Key",
+              "value": "{{X-Api-Key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Retrieve a list of planting activities. The id in the response is used for  GET /v4/layers/asPlanted/{activityId}/contents."
+        },
+        {
+          "info": {
+            "name": "Retrieve the raw planting activity",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://platform.climate.com/v4/layers/asPlanted/:activityId/contents",
+            "headers": [
+              {
+                "name": "Accept",
+                "value": ""
+              },
+              {
+                "name": "Range",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "activityId",
+                "value": "",
+                "type": "path",
+                "description": "Unique identifier of the Planting Activity."
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "X-Api-Key",
+              "value": "{{X-Api-Key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Retrieve an individual planting activity by id.  Ids are retrieved via the  /layers/asPlanted route. Downloads larger than `5MiB` (`5242880 bytes`) in size, must be downloaded in chunks no larger than `5MiB` (`5242880 bytes`) and no smaller than `1MiB`  (`1048576 bytes`). The last chunk could be less than `1MiB` (`1048576 bytes`).  The data is compressed using .zip format."
+        },
+        {
+          "info": {
+            "name": "Retrieve the summary of an activity as planted agronomic data",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://platform.climate.com/v4/layers/asPlanted/:activityId",
+            "headers": [
+              {
+                "name": "Accept",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "activityId",
+                "value": "",
+                "type": "path",
+                "description": "Unique identifier of the Planting Activity."
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "X-Api-Key",
+              "value": "{{X-Api-Key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Retrieve an individual planting activity summary by id. Ids are retrieved via the /layers/asPlanted route."
+        },
+        {
+          "info": {
+            "name": "Retrieve a list of application activities",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://platform.climate.com/v4/layers/asApplied",
+            "headers": [
+              {
+                "name": "Accept",
+                "value": ""
+              },
+              {
+                "name": "X-Next-Token",
+                "value": ""
+              },
+              {
+                "name": "X-Limit",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "resourceOwnerId",
+                "value": "",
+                "type": "query",
+                "description": "Optional unique identifier of the resource owner.  If resourceOwnerId is not specified, it defaults to the x-authenticated-user-uuid."
+              },
+              {
+                "name": "occurredAfter",
+                "value": "",
+                "type": "query",
+                "description": "Optional start time by which to filter layer results. Time must be in ISO 8601 format with time zone, e.g. 2016-05-13T00:00:00Z (https://tools.ietf.org/html/rfc3339). Layers with an end time at or after (inclusive) the specified time will match this filter. If both occurredAfter and occurredBefore are populated, occurredAfter must be <= occurredBefore."
+              },
+              {
+                "name": "occurredBefore",
+                "value": "",
+                "type": "query",
+                "description": "Optional end time by which to filter layer results. Time must be in ISO 8601 format with time zone, e.g. 2016-05-13T00:00:00Z (https://tools.ietf.org/html/rfc3339). Layers with a start time at or before (inclusive) the specified time. If both occurredAfter and occurredBefore are populated, occurredAfter must be <= occurredBefore."
+              },
+              {
+                "name": "updatedAfter",
+                "value": "",
+                "type": "query",
+                "description": "Optional updated time by which to filter layer results. Time must be in ISO 8601 format with time zone, e.g. 2016-05-13T00:00:00Z (https://tools.ietf.org/html/rfc3339). Layers with a modification time at or after (inclusive) the specified time."
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "X-Api-Key",
+              "value": "{{X-Api-Key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Retrieve a list of application activities. The id in the response is used for  GET /v4/layers/asApplied/{activityId}/contents."
+        },
+        {
+          "info": {
+            "name": "Retrieve the raw application activity",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://platform.climate.com/v4/layers/asApplied/:activityId/contents",
+            "headers": [
+              {
+                "name": "Accept",
+                "value": ""
+              },
+              {
+                "name": "Range",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "activityId",
+                "value": "",
+                "type": "path",
+                "description": "Unique identifier of the Application Activity."
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "X-Api-Key",
+              "value": "{{X-Api-Key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Retrieve an individual application activity by id.  Ids are retrieved via the  /layers/asApplied route. Downloads larger than `5MiB` (`5242880 bytes`) in size, must be downloaded in chunks no larger than `5MiB` (`5242880 bytes`) and no smaller than `1MiB`  (`1048576 bytes`). The last chunk could be less than `1MiB` (`1048576 bytes`). The data is compressed using .zip format."
+        },
+        {
+          "info": {
+            "name": "Retrieve the summary of an activity as applied agronomic data",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://platform.climate.com/v4/layers/asApplied/:activityId",
+            "headers": [
+              {
+                "name": "Accept",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "activityId",
+                "value": "",
+                "type": "path",
+                "description": "Unique identifier of the Application Activity."
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "X-Api-Key",
+              "value": "{{X-Api-Key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Retrieve an individual application activity summary by id. Ids are retrieved via the /layers/asApplied route."
+        },
+        {
+          "info": {
+            "name": "Retrieve a list of harvest activities",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://platform.climate.com/v4/layers/asHarvested",
+            "headers": [
+              {
+                "name": "Accept",
+                "value": ""
+              },
+              {
+                "name": "X-Next-Token",
+                "value": ""
+              },
+              {
+                "name": "X-Limit",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "resourceOwnerId",
+                "value": "",
+                "type": "query",
+                "description": "Optional unique identifier of the resource owner.  If resourceOwnerId is not specified, it defaults to the x-authenticated-user-uuid."
+              },
+              {
+                "name": "occurredAfter",
+                "value": "",
+                "type": "query",
+                "description": "Optional start time by which to filter layer results. Time must be in ISO 8601 format with time zone, e.g. 2016-05-13T00:00:00Z (https://tools.ietf.org/html/rfc3339). Layers with an end time at or after (inclusive) the specified time will match this filter. If both occurredAfter and occurredBefore are populated, occurredAfter must be <= occurredBefore."
+              },
+              {
+                "name": "occurredBefore",
+                "value": "",
+                "type": "query",
+                "description": "Optional end time by which to filter layer results. Time must be in ISO 8601 format with time zone, e.g. 2016-05-13T00:00:00Z (https://tools.ietf.org/html/rfc3339). Layers with a start time at or before (inclusive) the specified time. If both occurredAfter and occurredBefore are populated, occurredAfter must be <= occurredBefore."
+              },
+              {
+                "name": "updatedAfter",
+                "value": "",
+                "type": "query",
+                "description": "Optional updated time by which to filter layer results. Time must be in ISO 8601 format with time zone, e.g. 2016-05-13T00:00:00Z (https://tools.ietf.org/html/rfc3339). Layers with a modification time at or after (inclusive) the specified time."
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "X-Api-Key",
+              "value": "{{X-Api-Key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Retrieve a list of harvest activities. The id in the response is used for  GET /v4/layers/asHarvested/{activityId}/contents."
+        },
+        {
+          "info": {
+            "name": "Retrieve the raw harvest activity",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://platform.climate.com/v4/layers/asHarvested/:activityId/contents",
+            "headers": [
+              {
+                "name": "Accept",
+                "value": ""
+              },
+              {
+                "name": "Range",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "activityId",
+                "value": "",
+                "type": "path",
+                "description": "Unique identifier of the Harvest Activity."
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "X-Api-Key",
+              "value": "{{X-Api-Key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Retrieve an individual harvest activity by id.  Ids are retrieved via the  /layers/asHarvested route. Downloads larger than `5MiB` (`5242880 bytes`) in size, must be downloaded in chunks no larger than `5MiB` (`5242880 bytes`) and no smaller than `1MiB`  (`1048576 bytes`). The last chunk could be less than `1MiB` (`1048576 bytes`). The data is compressed using .zip format."
+        },
+        {
+          "info": {
+            "name": "Retrieve the summary of an activity as harvested agronomic data",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://platform.climate.com/v4/layers/asHarvested/:activityId",
+            "headers": [
+              {
+                "name": "Accept",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "activityId",
+                "value": "",
+                "type": "path",
+                "description": "Unique identifier of the Harvest Activity."
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "X-Api-Key",
+              "value": "{{X-Api-Key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Retrieve an individual harvest activity summary by id. Ids are retrieved via the /layers/asHarvested route."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

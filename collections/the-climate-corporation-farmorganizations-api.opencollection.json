@@ -1,0 +1,49 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Climate FieldView Platform APIs Boundaries FarmOrganizations API",
+    "version": "4.0.11"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "FarmOrganizations",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Retrieve a specific farm organization by organization type and ID",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://platform.climate.com/v4/farmOrganizations/:farmOrganizationType/:farmOrganizationId",
+            "params": [
+              {
+                "name": "farmOrganizationType",
+                "value": "",
+                "type": "path",
+                "description": "Type of the farm organization."
+              },
+              {
+                "name": "farmOrganizationId",
+                "value": "",
+                "type": "path",
+                "description": "Unique identifier of the farm organization."
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "X-Api-Key",
+              "value": "{{X-Api-Key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Retrieve a given **farm organization** by organization type and ID."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

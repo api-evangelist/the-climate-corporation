@@ -1,0 +1,126 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Climate FieldView Platform APIs Boundaries Uploads API",
+    "version": "4.0.11"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Uploads",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Initiate a new upload",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://platform.climate.com/v4/uploads",
+            "headers": [
+              {
+                "name": "X-Recipient-Email",
+                "value": ""
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "X-Api-Key",
+              "value": "{{X-Api-Key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Step one in uploading a data product. The method will return an **Upload** ID which the caller will use in subsequent `PUT` requests.\nThe following `contentTypes` may be uploaded:\n    <details><summary>__image/vnd.climate.thermal.geotiff__</summary>\n\n    Allows for the upload of a thermal image. The image is a single band geotiff with 64 bit signed floating point values in degrees Celsius. The Coordinate Reference System (CRS) must be UTM with WGS84 datum.\n\n    The following metadata entries are"
+        },
+        {
+          "info": {
+            "name": "Chunked upload of data",
+            "type": "http"
+          },
+          "http": {
+            "method": "PUT",
+            "url": "https://platform.climate.com/v4/uploads/:uploadId",
+            "headers": [
+              {
+                "name": "Content-Range",
+                "value": ""
+              },
+              {
+                "name": "Content-Type",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "uploadId",
+                "value": "",
+                "type": "path",
+                "description": "Unique identifier of an Upload."
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "X-Api-Key",
+              "value": "{{X-Api-Key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Send chunked data for an **Upload**."
+        },
+        {
+          "info": {
+            "name": "Retrieve Upload status",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://platform.climate.com/v4/uploads/:uploadId/status",
+            "params": [
+              {
+                "name": "uploadId",
+                "value": "",
+                "type": "path",
+                "description": "Unique identifier of an Upload."
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "X-Api-Key",
+              "value": "{{X-Api-Key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Check the status of an **Upload** by ID."
+        },
+        {
+          "info": {
+            "name": "Retrieve Upload statuses in batch",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://platform.climate.com/v4/uploads/status/query",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "X-Api-Key",
+              "value": "{{X-Api-Key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Check the status of multiple **Uploads** (up to 100 per request)."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

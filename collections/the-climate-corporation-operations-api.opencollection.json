@@ -1,0 +1,43 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Climate FieldView Platform APIs Boundaries Operations API",
+    "version": "4.0.11"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Operations",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Retrieve the operations accessible to a a given user.",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://platform.climate.com/v4/operations/all",
+            "params": [
+              {
+                "name": "resourceOwnerId",
+                "value": "",
+                "type": "query",
+                "description": "Optional comma-separated list of resource owner unique identifiers by which to filter results."
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "X-Api-Key",
+              "value": "{{X-Api-Key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Retrieve the **operations** accessible to the authenticated user. Filter the results by resource owner if the `resourceOwnerId` query parameter is specified."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

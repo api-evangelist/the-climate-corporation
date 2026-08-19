@@ -1,73 +1,76 @@
 generated: '2026-07-21'
 method: derived
 status: candidate
-source: >-
-  Derived from openapi/the-climate-corporation-platform-openapi-original.yml
-  (v4.0.11). No official hosted/remote Climate FieldView MCP server was found on
-  the developer portal (dev.fieldview.com), npm (@modelcontextprotocol / climate
-  / fieldview), or the public MCP registries as of 2026-07-21. This is a
-  candidate tool surface an integrator could expose over MCP; it is not a
-  published server.
+source: Derived from openapi/the-climate-corporation-platform-openapi-original.yml (v4.0.11). No official
+  hosted/remote Climate FieldView MCP server was found on the developer portal (dev.fieldview.com), npm
+  (@modelcontextprotocol / climate / fieldview), or the public MCP registries as of 2026-07-21. This is
+  a candidate tool surface an integrator could expose over MCP; it is not a published server.
 server:
   name: climate-fieldview
   transport: http
   url: null
   auth: OAuth2 authorization_code bearer token + X-Api-Key header (see authentication/)
 tools:
-  - name: fetch_fields
-    description: Retrieve the list of Fields (optionally filtered by field name).
-    source_operation: openapi/the-climate-corporation-platform-openapi-original.yml#fetchFields
-  - name: fetch_field_by_id
-    description: Retrieve a specific Field by ID.
-    source_operation: openapi/the-climate-corporation-platform-openapi-original.yml#fetchFieldById
-  - name: fetch_boundary_by_id
-    description: Retrieve a specific field Boundary by ID.
-    source_operation: openapi/the-climate-corporation-platform-openapi-original.yml#fetchBoundaryById
-  - name: fetch_boundaries
-    description: Query field Boundaries.
-    source_operation: openapi/the-climate-corporation-platform-openapi-original.yml#fetchBoundaries
-  - name: upload_boundary
-    description: Upload a new field Boundary.
-    source_operation: openapi/the-climate-corporation-platform-openapi-original.yml#uploadBoundary
-  - name: fetch_farm_organization_by_type_and_id
-    description: Retrieve a farm organization by organization type and ID.
-    source_operation: openapi/the-climate-corporation-platform-openapi-original.yml#fetchFarmOrganizationByTypeAndId
-  - name: fetch_operations
-    description: Retrieve the list of farming Operations.
-    source_operation: openapi/the-climate-corporation-platform-openapi-original.yml#fetchOperations
-  - name: get_resource_owner
-    description: Retrieve resource owner information.
-    source_operation: openapi/the-climate-corporation-platform-openapi-original.yml#getResourceOwner
-  - name: post_upload
-    description: Start a data upload (as-planted / as-harvested / as-applied / imagery / rx / soil).
-    source_operation: openapi/the-climate-corporation-platform-openapi-original.yml#postUpload
-  - name: chunked_upload
-    description: Upload data content chunk for an in-progress upload.
-    source_operation: openapi/the-climate-corporation-platform-openapi-original.yml#chunkedUpload
-  - name: fetch_upload_status_by_id
-    description: Poll the status of a specific upload.
-    source_operation: openapi/the-climate-corporation-platform-openapi-original.yml#fetchUploadStatusById
-  - name: fetch_upload_statuses
-    description: Query the status of multiple uploads.
-    source_operation: openapi/the-climate-corporation-platform-openapi-original.yml#fetchUploadStatuses
-  - name: post_export
-    description: Request a data export.
-    source_operation: openapi/the-climate-corporation-platform-openapi-original.yml#postExport
-  - name: fetch_export_status_by_id
-    description: Poll the status of an export request.
-    source_operation: openapi/the-climate-corporation-platform-openapi-original.yml#fetchExportStatusById
-  - name: fetch_export_contents_by_id
-    description: Retrieve the contents of a completed export.
-    source_operation: openapi/the-climate-corporation-platform-openapi-original.yml#fetchExportContentsById
-  - name: fetch_as_planted_layers
-    description: Retrieve as-planted agronomic data layers.
-    source_operation: openapi/the-climate-corporation-platform-openapi-original.yml#/v4/layers/asPlanted
-  - name: fetch_as_applied_layers
-    description: Retrieve as-applied agronomic data layers.
-    source_operation: openapi/the-climate-corporation-platform-openapi-original.yml#/v4/layers/asApplied
-  - name: fetch_as_harvested_layers
-    description: Retrieve as-harvested agronomic data layers.
-    source_operation: openapi/the-climate-corporation-platform-openapi-original.yml#/v4/layers/asHarvested
-  - name: fetch_scouting_observations
-    description: Retrieve scouting observation layers and attachments.
-    source_operation: openapi/the-climate-corporation-platform-openapi-original.yml#/v4/layers/scoutingObservations
+- name: fetch_fields
+  description: Retrieve the list of Fields (optionally filtered by field name).
+  source_operation: openapi/the-climate-corporation-platform-openapi-original.yml#fetchFields
+- name: fetch_field_by_id
+  description: Retrieve a specific Field by ID.
+  source_operation: openapi/the-climate-corporation-platform-openapi-original.yml#fetchFieldById
+- name: fetch_boundary_by_id
+  description: Retrieve a specific field Boundary by ID.
+  source_operation: openapi/the-climate-corporation-platform-openapi-original.yml#fetchBoundaryById
+- name: fetch_boundaries
+  description: Query field Boundaries.
+  source_operation: openapi/the-climate-corporation-platform-openapi-original.yml#fetchBoundaries
+- name: upload_boundary
+  description: Upload a new field Boundary.
+  source_operation: openapi/the-climate-corporation-platform-openapi-original.yml#uploadBoundary
+- name: fetch_farm_organization_by_type_and_id
+  description: Retrieve a farm organization by organization type and ID.
+  source_operation: openapi/the-climate-corporation-platform-openapi-original.yml#fetchFarmOrganizationByTypeAndId
+- name: fetch_operations
+  description: Retrieve the list of farming Operations.
+  source_operation: openapi/the-climate-corporation-platform-openapi-original.yml#fetchOperations
+- name: get_resource_owner
+  description: Retrieve resource owner information.
+  source_operation: openapi/the-climate-corporation-platform-openapi-original.yml#getResourceOwner
+- name: post_upload
+  description: Start a data upload (as-planted / as-harvested / as-applied / imagery / rx / soil).
+  source_operation: openapi/the-climate-corporation-platform-openapi-original.yml#postUpload
+- name: chunked_upload
+  description: Upload data content chunk for an in-progress upload.
+  source_operation: openapi/the-climate-corporation-platform-openapi-original.yml#chunkedUpload
+- name: fetch_upload_status_by_id
+  description: Poll the status of a specific upload.
+  source_operation: openapi/the-climate-corporation-platform-openapi-original.yml#fetchUploadStatusById
+- name: fetch_upload_statuses
+  description: Query the status of multiple uploads.
+  source_operation: openapi/the-climate-corporation-platform-openapi-original.yml#fetchUploadStatuses
+- name: post_export
+  description: Request a data export.
+  source_operation: openapi/the-climate-corporation-platform-openapi-original.yml#postExport
+- name: fetch_export_status_by_id
+  description: Poll the status of an export request.
+  source_operation: openapi/the-climate-corporation-platform-openapi-original.yml#fetchExportStatusById
+- name: fetch_export_contents_by_id
+  description: Retrieve the contents of a completed export.
+  source_operation: openapi/the-climate-corporation-platform-openapi-original.yml#fetchExportContentsById
+- name: fetch_as_planted_layers
+  description: Retrieve as-planted agronomic data layers.
+  source_operation: openapi/the-climate-corporation-platform-openapi-original.yml#/v4/layers/asPlanted
+- name: fetch_as_applied_layers
+  description: Retrieve as-applied agronomic data layers.
+  source_operation: openapi/the-climate-corporation-platform-openapi-original.yml#/v4/layers/asApplied
+- name: fetch_as_harvested_layers
+  description: Retrieve as-harvested agronomic data layers.
+  source_operation: openapi/the-climate-corporation-platform-openapi-original.yml#/v4/layers/asHarvested
+- name: fetch_scouting_observations
+  description: Retrieve scouting observation layers and attachments.
+  source_operation: openapi/the-climate-corporation-platform-openapi-original.yml#/v4/layers/scoutingObservations
+deployment:
+  mode: none
+  verified: derived
+  tools: 19
+  checked: '2026-08-12'
+  source: catalog MCP census

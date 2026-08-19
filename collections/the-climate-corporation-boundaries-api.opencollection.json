@@ -1,0 +1,85 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Climate FieldView Platform APIs Boundaries API",
+    "version": "4.0.11"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Boundaries",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Retrieve a Boundary by ID",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://platform.climate.com/v4/boundaries/:boundaryId",
+            "params": [
+              {
+                "name": "boundaryId",
+                "value": "",
+                "type": "path",
+                "description": "Unique identifier of the Boundary"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "X-Api-Key",
+              "value": "{{X-Api-Key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Retrieve a **Boundary** by ID."
+        },
+        {
+          "info": {
+            "name": "Retrieve Boundaries in batch",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://platform.climate.com/v4/boundaries/query",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "X-Api-Key",
+              "value": "{{X-Api-Key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Retrieve multiple **Boundaries** (up to 10 per request)."
+        },
+        {
+          "info": {
+            "name": "Upload a boundary",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://platform.climate.com/v4/boundaries",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "X-Api-Key",
+              "value": "{{X-Api-Key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Upload a **Boundary** entry by passing the geometry of the boundary. This will store the boundary but will not create field in Climate FieldView and will not link to an existing field in Climate FieldView.\nThis is restricted to callers with **boundaries:write** scope.\nTo upload a field boundary for field creation in Climate FieldView, please use **POST /v4/uploads**."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

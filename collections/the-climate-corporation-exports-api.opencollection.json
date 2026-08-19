@@ -1,0 +1,99 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Climate FieldView Platform APIs Boundaries Exports API",
+    "version": "4.0.11"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Exports",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Initiate a new export request.",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://platform.climate.com/v4/exports",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "X-Api-Key",
+              "value": "{{X-Api-Key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Step one in requesting a data product. The method will return an **Export** ID which the caller will use in subsequent `GET` requests.\nThe following `contentTypes` may be requested:\n  * __application/vnd.climate.acrsi.geojson__ (Beta)\n     Exports the planting activities accessible by the authenticated user and optionally filtered by resource owner\n     as a [GeoJSON Feature Collection](https://tools.ietf.org/html/rfc7946#page-12).\n\n     The export request definition must contain the following p"
+        },
+        {
+          "info": {
+            "name": "Retrieve the status of an Export.",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://platform.climate.com/v4/exports/:exportId/status",
+            "params": [
+              {
+                "name": "exportId",
+                "value": "",
+                "type": "path",
+                "description": "Unique identifier of an Export."
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "X-Api-Key",
+              "value": "{{X-Api-Key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Check the status of an **Export** by ID."
+        },
+        {
+          "info": {
+            "name": "Retrieve the binary contents of a processed export request.",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://platform.climate.com/v4/exports/:exportId/contents",
+            "headers": [
+              {
+                "name": "Accept",
+                "value": ""
+              },
+              {
+                "name": "Range",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "exportId",
+                "value": "",
+                "type": "path",
+                "description": "Unique identifier of an Export."
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "X-Api-Key",
+              "value": "{{X-Api-Key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Downloads larger than `5MiB` (`5242880 bytes`) in size must be downloaded in chunks no larger than `5MiB` (`5242880 bytes`) and no smaller than `1MiB` (`1048576 bytes`). The last chunk could be less than `1MiB` (`1048576 bytes`)."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

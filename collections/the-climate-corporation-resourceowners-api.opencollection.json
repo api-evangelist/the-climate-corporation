@@ -1,0 +1,43 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Climate FieldView Platform APIs Boundaries ResourceOwners API",
+    "version": "4.0.11"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "ResourceOwners",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Retrieve a resource owner by ID",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://platform.climate.com/v4/resourceOwners/:resourceOwnerId",
+            "params": [
+              {
+                "name": "resourceOwnerId",
+                "value": "",
+                "type": "path",
+                "description": "Unique identifier of the resource owner."
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "X-Api-Key",
+              "value": "{{X-Api-Key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Retrieve a resource owner for the given `resourceOwnerId`."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

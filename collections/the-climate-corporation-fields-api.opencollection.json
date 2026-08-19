@@ -1,0 +1,78 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Climate FieldView Platform APIs Boundaries Fields API",
+    "version": "4.0.11"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Fields",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Retrieve list of Fields",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://platform.climate.com/v4/fields",
+            "headers": [
+              {
+                "name": "X-Next-Token",
+                "value": ""
+              },
+              {
+                "name": "X-Limit",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "fieldName",
+                "value": "",
+                "type": "query",
+                "description": "Optional prefix filter for field name. Must be at least 3 characters."
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "X-Api-Key",
+              "value": "{{X-Api-Key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Retrieve list of **Fields**. Filter the results by field name if the `fieldName` query parameter is specified."
+        },
+        {
+          "info": {
+            "name": "Retrieve a specific Field by ID",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://platform.climate.com/v4/fields/:fieldId",
+            "params": [
+              {
+                "name": "fieldId",
+                "value": "",
+                "type": "path",
+                "description": "Unique identifier of the Field."
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "X-Api-Key",
+              "value": "{{X-Api-Key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Retrieve a given **Field** by ID."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}
