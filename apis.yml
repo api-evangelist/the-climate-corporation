@@ -41,6 +41,14 @@ tags:
 - Digital Agriculture
 - Farm Management
 - Geospatial
+tags_raw:
+- Company
+- Climate
+- Agriculture
+- AgTech
+- Digital Agriculture
+- Farm Management
+- Geospatial
 - APIs
 maintainers:
 - FN: Kin Lane
@@ -68,6 +76,8 @@ apis:
   humanURL: https://dev.fieldview.com/technical-documentation/
   baseURL: https://platform.climate.com
   tags:
+  - Export
+  tags_raw:
   - Exports
   properties:
   - type: OpenAPI
@@ -123,7 +133,8 @@ apis:
   description: Operation data endpoints.
   humanURL: https://dev.fieldview.com/technical-documentation/
   baseURL: https://platform.climate.com
-  tags:
+  tags: []
+  tags_raw:
   - Operations
   properties:
   - type: OpenAPI
