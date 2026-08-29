@@ -1,0 +1,47 @@
+slug: the-climate-corporation
+provider: The Climate Corporation
+generated_by: planning/capability-mapping/scripts/classify_capabilities.py
+model: claude-opus-5
+frame:
+- Agriculture & Food Production
+min_confidence: 0.7
+capability_model:
+  source: https://github.com/vincentmakes/turbo-ea-capabilities
+  license: CC-BY-4.0
+  attribution: Turbo EA Capabilities by Vincent Verdet — Turbo EA, https://github.com/vincentmakes/turbo-ea-capabilities,
+    CC BY 4.0
+  notice: NOTICE
+edge_count: 3
+edges:
+- tag: Boundaries
+  spec_file: the-climate-corporation-boundaries-api-openapi.yml
+  capability_id: BC-3540.20
+  capability_id_l1: BC-3540
+  capability_name: Field and Parcel Management
+  confidence: 0.88
+  evidence: '"Upload a boundary", "Retrieve a Boundary by ID"; schemas Boundary, BoundaryProperties, Geometry,
+    Area'
+  reason: Create and retrieve geospatial field boundary geometries for growers' farms — this is field/parcel
+    boundary record management within farm land and asset management.
+- tag: Fields
+  spec_file: the-climate-corporation-fields-api-openapi.yml
+  capability_id: BC-3540.20
+  capability_id_l1: BC-3540
+  capability_name: Field and Parcel Management
+  confidence: 0.85
+  evidence: '"Retrieve list of Fields", "Retrieve a specific Field by ID"; schemas Field, Fields, Parent'
+  reason: Read access to the grower's field records and their parent hierarchy in a digital agriculture
+    platform — field and parcel record management.
+- tag: Layers
+  spec_file: the-climate-corporation-layers-api-openapi.yml
+  capability_id: BC-3500
+  capability_id_l1: BC-3500
+  capability_name: Crop Production Management
+  confidence: 0.82
+  evidence: GET /v4/layers/asPlanted  "Retrieve a list of planting activities"; GET /v4/layers/asApplied
+    "Retrieve the summary of an activity as applied agronomic data"; GET /v4/layers/scoutingObservations
+    "Retrieve a list of scouting observations"
+  reason: Operations expose field-level agronomic activity layers — as-planted, as-applied, as-harvested
+    and scouting observations — which are the records of on-farm cropping operations. L1 Crop Production
+    Management is right; no single L2 fits because the surface spans planting, application, scouting and
+    harvest.

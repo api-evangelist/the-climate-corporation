@@ -184,6 +184,9 @@ apis:
   - type: Documentation
     url: https://dev.fieldview.com/api-details/
 common:
+- type: CapabilityMap
+  url: capabilities/the-climate-corporation-capability-edges.yml
+  name: The Climate Corporation Business Capability Map
 - type: Overlay
   url: overlays/the-climate-corporation-platform-overlay.yaml
 - type: DeveloperPortal
