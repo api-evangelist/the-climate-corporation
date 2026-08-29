@@ -10,6 +10,18 @@ description: >-
   bulk uploads and exports of planting, application, harvest, imagery, seeding
   prescription (rx), and soil-sample data. Every call requires both a Bearer
   access token and a partner X-Api-Key. A v5 API surface is in preview.
+deliveryModel:
+  model: saas
+  open_source: false
+  commercial: true
+  callable_host: true
+  label: Hosted service · you call their endpoint
+  confidence: high
+  source:
+  - openapi
+  - pricing
+  generated: '2026-08-28'
+  method: derived
 accessModel:
   pricing: unknown
   onboarding: self-serve
