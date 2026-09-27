@@ -426,6 +426,188 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
+    BinaryData:
+      description: Binary contents
+      type: string
+      format: binary
+    ScoutingObservationAttachmentContents:
+      required:
+      - body
+      properties:
+        body:
+          $ref: '#/components/schemas/BinaryData'
+    ScoutingObservationSummary:
+      type: object
+      required:
+      - id
+      - startTime
+      - endTime
+      - updatedAt
+      properties:
+        id:
+          description: The id of a scouting observation.
+          type: string
+          format: uuid
+        startTime:
+          description: The start time of the scouting observation. Time in ISO 8601 format with UTC timezone, 3 fractional seconds (https://tools.ietf.org/html/rfc3339).
+          type: string
+          format: date-time
+        endTime:
+          description: The start time of the scouting observation. Time in ISO 8601 format with UTC timezone, 3 fractional seconds (https://tools.ietf.org/html/rfc3339).
+          type: string
+          format: date-time
+        updatedAt:
+          description: The time the scouting observation or any of its attachments was last updated.Time in ISO 8601 format with UTC timezone, 3 fractional seconds. (https://tools.ietf.org/html/rfc3339).
+          type: string
+          format: date-time
+    ApplicationActivities:
+      description: A batch of application activities
+      required:
+      - results
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApplicationActivitySummary'
+    ScoutingObservation:
+      type: object
+      required:
+      - id
+      - title
+      - note
+      - location
+      - startTime
+      - endTime
+      - updatedAt
+      - fieldIds
+      - tags
+      - timespan
+      - locationDisplayColor
+      - status
+      properties:
+        id:
+          description: The id of a scouting observation.
+          type: string
+          format: uuid
+        title:
+          description: The title or summary of the scouting observation. 40 Characters long, no emojis, and leading and trailing whitespace will be trimmed.
+          type: string
+        note:
+          description: The text of the scouting observation. Maximum of 4000 characters.
+          type: string
+        location:
+          description: Where the scouting observation occurred.  GeoJson in WGS84.
+          $ref: '#/components/schemas/Geometry'
+        startTime:
+          description: The start time of the scouting observation. Time in ISO 8601 format with UTC timezone, 3 fractional seconds (https://tools.ietf.org/html/rfc3339).
+          type: string
+          format: date-time
+        endTime:
+          description: The start time of the scouting observation. Time in ISO 8601 format with UTC timezone, 3 fractional seconds (https://tools.ietf.org/html/rfc3339).
+          type: string
+          format: date-time
+        updatedAt:
+          description: The time the scouting observation or any of its attachments was last updated.Time in ISO 8601 format with UTC timezone, 3 fractional seconds. (https://tools.ietf.org/html/rfc3339).
+          type: string
+          format: date-time
+        fieldIds:
+          description: Array of field ids associated with this observation.
+          type: array
+          items:
+            type: string
+        tags:
+          description: For example, ROCK_STONE, PONDING_WET, HAIL Maximum 20 tags allowed, 40 characters per tag.
+          type: array
+          items:
+            $ref: '#/components/schemas/ScoutingTag'
+        timespan:
+          description: Permanent or seasonal
+          type: string
+          enum:
+          - PERMANENT
+          - SEASONAL
+        locationDisplayColor:
+          description: 'Color of scouting pin assigned in the Climate FieldView app.
+
+            Limited in the Ux to a set of RGB values.
+
+            * #307af7
+
+            * #38d753
+
+            * #b037e4
+
+            * #ef3e3e
+
+            * #f7ec41
+
+            * #ff8439
+
+            * #808080
+
+            '
+          type: string
+          enum:
+          - '#307af7'
+          - '#38d753'
+          - '#b037e4'
+          - '#ef3e3e'
+          - '#f7ec41'
+          - '#ff8439'
+          - '#808080'
+        status:
+          description: 'The status of the scouting observation For example : ACTIVE, DELETED'
+          type: string
+          enum:
+          - ACTIVE
+          - DELETED
+    HarvestActivityContents:
+      required:
+      - body
+      properties:
+        body:
+          $ref: '#/components/schemas/BinaryData'
+    Empty:
+      type: object
+    PlantingActivities:
+      description: A batch of planting activities
+      required:
+      - results
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/PlantingActivitySummary'
+    ScoutingObservations:
+      description: A batch of scouting observations
+      required:
+      - results
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ScoutingObservationSummary'
+    Geometry:
+      description: GeoJSON
+      required:
+      - type
+      - coordinates
+      properties:
+        type:
+          type: string
+          enum:
+          - Point
+          - Polygon
+          - MultiPolygon
+        coordinates:
+          type: array
+          items:
+            type: string
+      example:
+        type: Point
+        coordinates:
+        - 0
+        - 0
     ScoutingObservationAttachment:
       type: object
       required:
@@ -462,6 +644,52 @@ components:
           enum:
           - ACTIVE
           - DELETED
+    ApplicationActivityContents:
+      required:
+      - body
+      properties:
+        body:
+          $ref: '#/components/schemas/BinaryData'
+    HarvestActivities:
+      description: A batch of harvest activities
+      required:
+      - results
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/HarvestActivitySummary'
+    PlantingActivityContents:
+      required:
+      - body
+      properties:
+        body:
+          $ref: '#/components/schemas/BinaryData'
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          required:
+          - id
+          - code
+          - message
+          properties:
+            id:
+              type: string
+              format: uuid
+            code:
+              type: string
+            message:
+              type: string
+              description: Description of the error encountered.
+    ScoutingTag:
+      type: object
+      required:
+      - code
+      properties:
+        code:
+          type: string
     HarvestActivitySummary:
       type: object
       required:
@@ -502,79 +730,100 @@ components:
           type: array
           items:
             type: string
-    PlantingActivityContents:
-      required:
-      - body
-      properties:
-        body:
-          $ref: '#/components/schemas/BinaryData'
-    ApplicationActivities:
-      description: A batch of application activities
-      required:
-      - results
-      properties:
-        results:
-          type: array
-          items:
-            $ref: '#/components/schemas/ApplicationActivitySummary'
-    BinaryData:
-      description: Binary contents
-      type: string
-      format: binary
-    Error:
+    ApplicationActivitySummaryResponse:
       type: object
-      properties:
-        error:
-          type: object
-          required:
-          - id
-          - code
-          - message
-          properties:
-            id:
-              type: string
-              format: uuid
-            code:
-              type: string
-            message:
-              type: string
-              description: Description of the error encountered.
-    HarvestActivityContents:
       required:
-      - body
+      - id
+      - fieldId
+      - fileName
+      - fileSize
+      - indexedAt
+      - lastProcessedAt
+      - originalSrcModified
+      - serialNumber
+      - srcLastModified
+      - area
+      - cropId
+      - dataChecksum
+      - endTime
+      - processorVersion
+      - recordCount
+      - seasonCode
+      - startTime
       properties:
-        body:
-          $ref: '#/components/schemas/BinaryData'
-    Geometry:
-      description: GeoJSON
-      required:
-      - type
-      - coordinates
-      properties:
-        type:
+        id:
+          description: The id of an application activity.
           type: string
-          enum:
-          - Point
-          - Polygon
-          - MultiPolygon
-        coordinates:
-          type: array
-          items:
-            type: string
-      example:
-        type: Point
-        coordinates:
-        - 0
-        - 0
-    HarvestActivities:
-      description: A batch of harvest activities
-      required:
-      - results
-      properties:
-        results:
-          type: array
-          items:
-            $ref: '#/components/schemas/HarvestActivitySummary'
+          format: uuid
+        fieldId:
+          description: The id of an application activity field.
+          type: string
+          format: uuid
+        fileName:
+          description: File's name
+          type: string
+        fileSize:
+          description: File's size.
+          type: integer
+          format: int64
+        indexedAt:
+          description: The time the application activity was indexed.
+          type: string
+          format: date-time
+        lastProcessedAt:
+          description: The time the application activity was last processed.
+          type: string
+          format: date-time
+        originalSrcModified:
+          description: The time the application activity original src was last modified.
+          type: string
+          format: date-time
+        serialNumber:
+          description: Serial number.
+          type: integer
+          format: int32
+        srcLastModified:
+          description: The time the application activity src was last modified.
+          type: string
+          format: date-time
+        area:
+          description: The area of an application activity.
+          type: number
+          format: float
+        boundary:
+          description: The boundary of an application activity.
+          type: string
+        cropId:
+          description: The crop of an application activity.
+          type: integer
+          format: int64
+        dataChecksum:
+          description: The data checksum of an application activity.
+          type: string
+        endTime:
+          description: The time the application activity was ended.
+          type: string
+          format: date-time
+        machineId:
+          description: The machineId of an application activity.
+          type: string
+        processorVersion:
+          description: The processor version of an application activity.
+          type: string
+        recordCount:
+          description: The record count of an application activity.
+          type: integer
+          format: int64
+        seasonCode:
+          description: The season code of an application activity.
+          type: string
+        startTime:
+          description: The time the application activity was started.
+          type: string
+          format: date-time
+        passName:
+          description: The pass name of an application activity.
+          type: string
     HarvestActivitySummaryResponse:
       type: object
       required:
@@ -682,207 +931,46 @@ components:
           description: Load number.
           type: integer
           format: int32
-    ScoutingObservation:
+    ApplicationActivitySummary:
       type: object
       required:
       - id
-      - title
-      - note
-      - location
       - startTime
       - endTime
+      - createdAt
       - updatedAt
+      - length
       - fieldIds
-      - tags
-      - timespan
-      - locationDisplayColor
-      - status
-      properties:
-        id:
-          description: The id of a scouting observation.
-          type: string
-          format: uuid
-        title:
-          description: The title or summary of the scouting observation. 40 Characters long, no emojis, and leading and trailing whitespace will be trimmed.
-          type: string
-        note:
-          description: The text of the scouting observation. Maximum of 4000 characters.
-          type: string
-        location:
-          description: Where the scouting observation occurred.  GeoJson in WGS84.
-          $ref: '#/components/schemas/Geometry'
-        startTime:
-          description: The start time of the scouting observation. Time in ISO 8601 format with UTC timezone, 3 fractional seconds (https://tools.ietf.org/html/rfc3339).
-          type: string
-          format: date-time
-        endTime:
-          description: The start time of the scouting observation. Time in ISO 8601 format with UTC timezone, 3 fractional seconds (https://tools.ietf.org/html/rfc3339).
-          type: string
-          format: date-time
-        updatedAt:
-          description: The time the scouting observation or any of its attachments was last updated.Time in ISO 8601 format with UTC timezone, 3 fractional seconds. (https://tools.ietf.org/html/rfc3339).
-          type: string
-          format: date-time
-        fieldIds:
-          description: Array of field ids associated with this observation.
-          type: array
-          items:
-            type: string
-        tags:
-          description: For example, ROCK_STONE, PONDING_WET, HAIL Maximum 20 tags allowed, 40 characters per tag.
-          type: array
-          items:
-            $ref: '#/components/schemas/ScoutingTag'
-        timespan:
-          description: Permanent or seasonal
-          type: string
-          enum:
-          - PERMANENT
-          - SEASONAL
-        locationDisplayColor:
-          description: 'Color of scouting pin assigned in the Climate FieldView app.
-
-            Limited in the Ux to a set of RGB values.
-
-            * #307af7
-
-            * #38d753
-
-            * #b037e4
-
-            * #ef3e3e
-
-            * #f7ec41
-
-            * #ff8439
-
-            * #808080
-
-            '
-          type: string
-          enum:
-          - '#307af7'
-          - '#38d753'
-          - '#b037e4'
-          - '#ef3e3e'
-          - '#f7ec41'
-          - '#ff8439'
-          - '#808080'
-        status:
-          description: 'The status of the scouting observation For example : ACTIVE, DELETED'
-          type: string
-          enum:
-          - ACTIVE
-          - DELETED
-    ApplicationActivityContents:
-      required:
-      - body
-      properties:
-        body:
-          $ref: '#/components/schemas/BinaryData'
-    ApplicationActivitySummaryResponse:
-      type: object
-      required:
-      - id
-      - fieldId
-      - fileName
-      - fileSize
-      - indexedAt
-      - lastProcessedAt
-      - originalSrcModified
-      - serialNumber
-      - srcLastModified
-      - area
-      - cropId
-      - dataChecksum
-      - endTime
-      - processorVersion
-      - recordCount
-      - seasonCode
-      - startTime
       properties:
         id:
           description: The id of an application activity.
           type: string
           format: uuid
-        fieldId:
-          description: The id of an application activity field.
-          type: string
-          format: uuid
-        fileName:
-          description: File's name
-          type: string
-        fileSize:
-          description: File's size.
-          type: integer
-          format: int64
-        indexedAt:
-          description: The time the application activity was indexed.
-          type: string
-          format: date-time
-        lastProcessedAt:
-          description: The time the application activity was last processed.
-          type: string
-          format: date-time
-        originalSrcModified:
-          description: The time the application activity original src was last modified.
-          type: string
-          format: date-time
-        serialNumber:
-          description: Serial number.
-          type: integer
-          format: int32
-        srcLastModified:
-          description: The time the application activity src was last modified.
-          type: string
-          format: date-time
-        area:
-          description: The area of an application activity.
-          type: number
-          format: float
-        boundary:
-          description: The boundary of an application activity.
-          type: string
-        cropId:
-          description: The crop of an application activity.
-          type: integer
-          format: int64
-        dataChecksum:
-          description: The data checksum of an application activity.
-          type: string
-        endTime:
-          description: The time the application activity was ended.
-          type: string
-          format: date-time
-        machineId:
-          description: The machineId of an application activity.
-          type: string
-        processorVersion:
-          description: The processor version of an application activity.
-          type: string
-        recordCount:
-          description: The record count of an application activity.
-          type: integer
-          format: int64
-        seasonCode:
-          description: The season code of an application activity.
-          type: string
         startTime:
-          description: The time the application activity was started.
+          description: The start time of the application activity. Time in ISO 8601 format with UTC timezone, 3 fractional seconds (https://tools.ietf.org/html/rfc3339).
           type: string
           format: date-time
-        passName:
-          description: The pass name of an application activity.
+        endTime:
+          description: The start time of the application activity. Time in ISO 8601 format with UTC timezone, 3 fractional seconds (https://tools.ietf.org/html/rfc3339).
           type: string
-    ScoutingObservationAttachments:
-      description: A batch of scouting attachments
-      required:
-      - results
-      properties:
-        results:
+          format: date-time
+        createdAt:
+          description: The time the application activity was created. Time in ISO 8601 format with UTC timezone, 3 fractional seconds. (https://tools.ietf.org/html/rfc3339).
+          type: string
+          format: date-time
+        updatedAt:
+          description: The time the application activity was last updated. Time in ISO 8601 format with UTC timezone, 3 fractional seconds. (https://tools.ietf.org/html/rfc3339).
+          type: string
+          format: date-time
+        length:
+          description: The size in bytes of the raw application activity file.
+          type: integer
+          format: int64
+        fieldIds:
+          description: Array of field ids associated the application activity.
           type: array
           items:
-            $ref: '#/components/schemas/ScoutingObservationAttachment'
+            type: string
     PlantingActivitySummary:
       type: object
       required:
@@ -923,21 +1011,15 @@ components:
           type: array
           items:
             type: string
-    ScoutingObservationAttachmentContents:
-      required:
-      - body
-      properties:
-        body:
-          $ref: '#/components/schemas/BinaryData'
-    PlantingActivities:
-      description: A batch of planting activities
+    ScoutingObservationAttachments:
+      description: A batch of scouting attachments
       required:
       - results
       properties:
         results:
           type: array
           items:
-            $ref: '#/components/schemas/PlantingActivitySummary'
+            $ref: '#/components/schemas/ScoutingObservationAttachment'
     PlantingActivitySummaryResponse:
       type: object
       required:
@@ -1085,219 +1167,18 @@ components:
           description: The target pop average of a planting activity.
           type: number
           format: float
-    ScoutingTag:
-      type: object
-      required:
-      - code
-      properties:
-        code:
-          type: string
-    ScoutingObservations:
-      description: A batch of scouting observations
-      required:
-      - results
-      properties:
-        results:
-          type: array
-          items:
-            $ref: '#/components/schemas/ScoutingObservationSummary'
-    ScoutingObservationSummary:
-      type: object
-      required:
-      - id
-      - startTime
-      - endTime
-      - updatedAt
-      properties:
-        id:
-          description: The id of a scouting observation.
-          type: string
-          format: uuid
-        startTime:
-          description: The start time of the scouting observation. Time in ISO 8601 format with UTC timezone, 3 fractional seconds (https://tools.ietf.org/html/rfc3339).
-          type: string
-          format: date-time
-        endTime:
-          description: The start time of the scouting observation. Time in ISO 8601 format with UTC timezone, 3 fractional seconds (https://tools.ietf.org/html/rfc3339).
-          type: string
-          format: date-time
-        updatedAt:
-          description: The time the scouting observation or any of its attachments was last updated.Time in ISO 8601 format with UTC timezone, 3 fractional seconds. (https://tools.ietf.org/html/rfc3339).
-          type: string
-          format: date-time
-    ApplicationActivitySummary:
-      type: object
-      required:
-      - id
-      - startTime
-      - endTime
-      - createdAt
-      - updatedAt
-      - length
-      - fieldIds
-      properties:
-        id:
-          description: The id of an application activity.
-          type: string
-          format: uuid
-        startTime:
-          description: The start time of the application activity. Time in ISO 8601 format with UTC timezone, 3 fractional seconds (https://tools.ietf.org/html/rfc3339).
-          type: string
-          format: date-time
-        endTime:
-          description: The start time of the application activity. Time in ISO 8601 format with UTC timezone, 3 fractional seconds (https://tools.ietf.org/html/rfc3339).
-          type: string
-          format: date-time
-        createdAt:
-          description: The time the application activity was created. Time in ISO 8601 format with UTC timezone, 3 fractional seconds. (https://tools.ietf.org/html/rfc3339).
-          type: string
-          format: date-time
-        updatedAt:
-          description: The time the application activity was last updated. Time in ISO 8601 format with UTC timezone, 3 fractional seconds. (https://tools.ietf.org/html/rfc3339).
-          type: string
-          format: date-time
-        length:
-          description: The size in bytes of the raw application activity file.
-          type: integer
-          format: int64
-        fieldIds:
-          description: Array of field ids associated the application activity.
-          type: array
-          items:
-            type: string
-    Empty:
-      type: object
-  parameters:
-    X-Limit:
-      in: header
-      name: X-Limit
-      description: Max number of results to return per batch.  Must be between 1 and 100 inclusive.  Defaults to 100.
-      required: false
-      schema:
-        type: integer
-        format: int32
-        minimum: 1
-        maximum: 100
-    ApplicationActivityId:
-      in: path
-      description: Unique identifier of the Application Activity.
-      name: activityId
-      required: true
-      schema:
-        type: string
-        format: uuid
-    UpdatedAfter:
-      in: query
-      description: Optional updated time by which to filter layer results. Time must be in ISO 8601 format with time zone, e.g. 2016-05-13T00:00:00Z (https://tools.ietf.org/html/rfc3339). Layers with a modification time at or after (inclusive) the specified time.
-      name: updatedAfter
-      required: false
-      schema:
-        type: string
-        format: date-time
-    PlantingActivityId:
-      in: path
-      description: Unique identifier of the Planting Activity.
-      name: activityId
-      required: true
-      schema:
-        type: string
-        format: uuid
-    ScoutingObservationId:
-      in: path
-      description: Unique identifier of the Scouting Observation.
-      name: scoutingObservationId
-      required: true
-      schema:
-        type: string
-        format: uuid
-    X-Next-Token:
-      name: X-Next-Token
-      in: header
-      description: Opaque string which allows for fetching the next batch of results.  Can be used to poll for changes.
-      required: false
-      schema:
-        type: string
-    Range:
-      in: header
-      name: Range
-      description: Byte range `bytes=start-end` (https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.35.1). e.g. bytes=0-1048576. Currently only single range value is supported. Both start and end need to be specified, end value should be greater than start and end - start should not be greater than 5MiB.
-      required: true
-      schema:
-        type: string
-    OccurredAfter:
-      in: query
-      description: Optional start time by which to filter layer results. Time must be in ISO 8601 format with time zone, e.g. 2016-05-13T00:00:00Z (https://tools.ietf.org/html/rfc3339). Layers with an end time at or after (inclusive) the specified time will match this filter. If both occurredAfter and occurredBefore are populated, occurredAfter must be <= occurredBefore.
-      name: occurredAfter
-      required: false
-      schema:
-        type: string
-        format: date-time
-    HarvestActivityId:
-      in: path
-      description: Unique identifier of the Harvest Activity.
-      name: activityId
-      required: true
-      schema:
-        type: string
-        format: uuid
-    Accept:
-      in: header
-      name: Accept
-      required: true
-      description: Must be either \*/* or application/octet-stream,application/json
-      schema:
-        type: string
-    OptionalResourceOwnerId:
-      in: query
-      description: Optional unique identifier of the resource owner.  If resourceOwnerId is not specified, it defaults to the x-authenticated-user-uuid.
-      name: resourceOwnerId
-      required: false
-      schema:
-        type: string
-        format: uuid
-    OccurredBefore:
-      in: query
-      description: Optional end time by which to filter layer results. Time must be in ISO 8601 format with time zone, e.g. 2016-05-13T00:00:00Z (https://tools.ietf.org/html/rfc3339). Layers with a start time at or before (inclusive) the specified time. If both occurredAfter and occurredBefore are populated, occurredAfter must be <= occurredBefore.
-      name: occurredBefore
-      required: false
-      schema:
-        type: string
-        format: date-time
-    ScoutingObservationAttachmentId:
-      in: path
-      description: Unique identifier of the attachment.
-      name: attachmentId
-      required: true
-      schema:
-        type: string
-        format: uuid
   responses:
-    FetchHarvestActivitiesOk:
+    FetchPlantingActivitySummaryOk:
       description: OK
       headers:
         X-Http-Request-Id:
           description: Unique identifier assigned to the request.
           schema:
             type: string
-        X-Next-Token:
-          description: Token used to poll for updates.
-          schema:
-            type: string
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/HarvestActivities'
-    '403':
-      description: Forbidden
-      headers:
-        X-Http-Request-Id:
-          description: Unique identifier assigned to the request.
-          schema:
-            type: string
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
+            $ref: '#/components/schemas/PlantingActivitySummaryResponse'
     FetchApplicationActivitiesPartial:
       description: Partial Result
       headers:
@@ -1313,47 +1194,7 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ApplicationActivities'
-    FetchHarvestActivityOk:
-      description: OK
-      headers:
-        X-Http-Request-Id:
-          description: Unique identifier assigned to the request
-          schema:
-            type: string
-        Content-Range:
-          description: Byte range `bytes start-end/total` (https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.16). e.g. bytes 0-5242880/10242880. Downloads larger than 5MiB (5242880 bytes) in size must be downloaded in chunks no larger than 5MiB (5242880 bytes) and no smaller than 1MiB (1048576 bytes). The last chunk could be less than 1MiB (1048576 bytes).
-          schema:
-            type: string
-      content:
-        application/octet-stream:
-          schema:
-            $ref: '#/components/schemas/HarvestActivityContents'
-    '304':
-      description: Not Modified
-      headers:
-        X-Http-Request-Id:
-          description: Unique identifier assigned to the request.
-          schema:
-            type: string
-        X-Next-Token:
-          description: A token which may be used to poll for updates.
-          schema:
-            type: string
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Empty'
-    FetchScoutingObservationByIdOk:
-      description: Returns the requested scouting observation.
-      headers:
-        X-Http-Request-Id:
-          schema:
-            type: string
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ScoutingObservation'
-    FetchHarvestActivityPartial:
+    FetchPlantingActivityPartial:
       description: Partial Result
       headers:
         X-Http-Request-Id:
@@ -1367,19 +1208,8 @@ components:
       content:
         application/octet-stream:
           schema:
-            $ref: '#/components/schemas/HarvestActivityContents'
-    '401':
-      description: Unauthorized
-      headers:
-        X-Http-Request-Id:
-          description: Unique identifier assigned to the request.
-          schema:
-            type: string
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    FetchHarvestActivitiesPartial:
+            $ref: '#/components/schemas/PlantingActivityContents'
+    FetchScoutingObservationsPartial:
       description: Partial Result
       headers:
         X-Http-Request-Id:
@@ -1393,9 +1223,25 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/HarvestActivities'
-    '400':
-      description: Bad Input
+            $ref: '#/components/schemas/ScoutingObservations'
+    '503':
+      description: Server Busy
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+        Retry-After:
+          description: Number of seconds to wait before retrying the request.
+          schema:
+            type: integer
+            format: int32
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '404':
+      description: Not Found
       headers:
         X-Http-Request-Id:
           description: Unique identifier assigned to the request.
@@ -1405,62 +1251,6 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
-    FetchPlantingActivitySummaryOk:
-      description: OK
-      headers:
-        X-Http-Request-Id:
-          description: Unique identifier assigned to the request.
-          schema:
-            type: string
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/PlantingActivitySummaryResponse'
-    FetchScoutingObservationsOk:
-      description: OK
-      headers:
-        X-Http-Request-Id:
-          description: Unique identifier assigned to the request.
-          schema:
-            type: string
-        X-Next-Token:
-          description: Token used to poll for updates.
-          schema:
-            type: string
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ScoutingObservations'
-    FetchApplicationActivitiesOk:
-      description: OK
-      headers:
-        X-Http-Request-Id:
-          description: Unique identifier assigned to the request.
-          schema:
-            type: string
-        X-Next-Token:
-          description: Token used to poll for updates.
-          schema:
-            type: string
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApplicationActivities'
-    FetchPlantingActivitiesOk:
-      description: OK
-      headers:
-        X-Http-Request-Id:
-          description: Unique identifier assigned to the request.
-          schema:
-            type: string
-        X-Next-Token:
-          description: Token used to poll for updates.
-          schema:
-            type: string
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/PlantingActivities'
     '500':
       description: Internal Server Error
       headers:
@@ -1487,6 +1277,236 @@ components:
         application/octet-stream:
           schema:
             $ref: '#/components/schemas/PlantingActivityContents'
+    FetchApplicationActivityOk:
+      description: OK
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request
+          schema:
+            type: string
+        Content-Range:
+          description: Byte range `bytes start-end/total` (https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.16). e.g. bytes 0-5242880/10242880. Downloads larger than 5MiB (5242880 bytes) in size must be downloaded in chunks no larger than 5MiB (5242880 bytes) and no smaller than 1MiB (1048576 bytes). The last chunk could be less than 1MiB (1048576 bytes).
+          schema:
+            type: string
+      content:
+        application/octet-stream:
+          schema:
+            $ref: '#/components/schemas/ApplicationActivityContents'
+    FetchScoutingObservationByIdOk:
+      description: Returns the requested scouting observation.
+      headers:
+        X-Http-Request-Id:
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ScoutingObservation'
+    FetchApplicationActivityPartial:
+      description: Partial Result
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+        Content-Range:
+          description: Byte range `bytes start-end/total` (https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.16). e.g. bytes 0-5242880/10242880. Downloads larger than 5MiB (5242880 bytes) in size must be downloaded in chunks no larger than 5MiB (5242880 bytes) and no smaller than 1MiB (1048576 bytes). The last chunk could be less than 1MiB (1048576 bytes).
+          schema:
+            type: string
+      content:
+        application/octet-stream:
+          schema:
+            $ref: '#/components/schemas/ApplicationActivityContents'
+    FetchScoutingObservationsOk:
+      description: OK
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+        X-Next-Token:
+          description: Token used to poll for updates.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ScoutingObservations'
+    FetchPlantingActivitiesOk:
+      description: OK
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+        X-Next-Token:
+          description: Token used to poll for updates.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PlantingActivities'
+    '401':
+      description: Unauthorized
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    FetchPlantingActivitiesPartial:
+      description: Partial Result
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+        X-Next-Token:
+          description: Token used to fetch next batch of results.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PlantingActivities'
+    FetchScoutingObservationAttachmentsPartial:
+      description: Partial Result
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+        X-Next-Token:
+          description: Token used to fetch next batch of results.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ScoutingObservationAttachments'
+    FetchApplicationActivitySummaryOk:
+      description: OK
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApplicationActivitySummaryResponse'
+    '403':
+      description: Forbidden
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    FetchScoutingObservationAttachmentContentsPartial:
+      description: Partial Result
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+        Content-Range:
+          description: Byte range `bytes start-end/total` (https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.16). e.g. bytes 0-5242880/10242880. Downloads larger than 5MiB (5242880 bytes) in size must be downloaded in chunks no larger than 5MiB (5242880 bytes) and no smaller than 1MiB (1048576 bytes). The last chunk could be less than 1MiB (1048576 bytes).
+          schema:
+            type: string
+      content:
+        image/jpeg:
+          schema:
+            $ref: '#/components/schemas/ScoutingObservationAttachmentContents'
+    FetchHarvestActivityOk:
+      description: OK
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request
+          schema:
+            type: string
+        Content-Range:
+          description: Byte range `bytes start-end/total` (https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.16). e.g. bytes 0-5242880/10242880. Downloads larger than 5MiB (5242880 bytes) in size must be downloaded in chunks no larger than 5MiB (5242880 bytes) and no smaller than 1MiB (1048576 bytes). The last chunk could be less than 1MiB (1048576 bytes).
+          schema:
+            type: string
+      content:
+        application/octet-stream:
+          schema:
+            $ref: '#/components/schemas/HarvestActivityContents'
+    FetchApplicationActivitiesOk:
+      description: OK
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+        X-Next-Token:
+          description: Token used to poll for updates.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApplicationActivities'
+    FetchHarvestActivitySummaryOk:
+      description: OK
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/HarvestActivitySummaryResponse'
+    FetchHarvestActivityPartial:
+      description: Partial Result
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+        Content-Range:
+          description: Byte range `bytes start-end/total` (https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.16). e.g. bytes 0-5242880/10242880. Downloads larger than 5MiB (5242880 bytes) in size must be downloaded in chunks no larger than 5MiB (5242880 bytes) and no smaller than 1MiB (1048576 bytes). The last chunk could be less than 1MiB (1048576 bytes).
+          schema:
+            type: string
+      content:
+        application/octet-stream:
+          schema:
+            $ref: '#/components/schemas/HarvestActivityContents'
+    '400':
+      description: Bad Input
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    FetchHarvestActivitiesOk:
+      description: OK
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+        X-Next-Token:
+          description: Token used to poll for updates.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/HarvestActivities'
     FetchScoutingObservationAttachmentContentsOk:
       description: OK
       headers:
@@ -1505,6 +1525,27 @@ components:
         image/png:
           schema:
             $ref: '#/components/schemas/ScoutingObservationAttachmentContents'
+    FetchScoutingObservationAttachmentsOk:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ScoutingObservationAttachments'
+    FetchHarvestActivitiesPartial:
+      description: Partial Result
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+        X-Next-Token:
+          description: Token used to fetch next batch of results.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/HarvestActivities'
     '416':
       description: Range Not Satisfiable
       headers:
@@ -1516,166 +1557,125 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
-    FetchScoutingObservationsPartial:
-      description: Partial Result
+    '304':
+      description: Not Modified
       headers:
         X-Http-Request-Id:
           description: Unique identifier assigned to the request.
           schema:
             type: string
         X-Next-Token:
-          description: Token used to fetch next batch of results.
+          description: A token which may be used to poll for updates.
           schema:
             type: string
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ScoutingObservations'
-    FetchScoutingObservationAttachmentsPartial:
-      description: Partial Result
-      headers:
-        X-Http-Request-Id:
-          description: Unique identifier assigned to the request.
-          schema:
-            type: string
-        X-Next-Token:
-          description: Token used to fetch next batch of results.
-          schema:
-            type: string
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ScoutingObservationAttachments'
-    FetchPlantingActivitiesPartial:
-      description: Partial Result
-      headers:
-        X-Http-Request-Id:
-          description: Unique identifier assigned to the request.
-          schema:
-            type: string
-        X-Next-Token:
-          description: Token used to fetch next batch of results.
-          schema:
-            type: string
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/PlantingActivities'
-    FetchApplicationActivityPartial:
-      description: Partial Result
-      headers:
-        X-Http-Request-Id:
-          description: Unique identifier assigned to the request.
-          schema:
-            type: string
-        Content-Range:
-          description: Byte range `bytes start-end/total` (https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.16). e.g. bytes 0-5242880/10242880. Downloads larger than 5MiB (5242880 bytes) in size must be downloaded in chunks no larger than 5MiB (5242880 bytes) and no smaller than 1MiB (1048576 bytes). The last chunk could be less than 1MiB (1048576 bytes).
-          schema:
-            type: string
-      content:
-        application/octet-stream:
-          schema:
-            $ref: '#/components/schemas/ApplicationActivityContents'
-    FetchScoutingObservationAttachmentsOk:
-      description: OK
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ScoutingObservationAttachments'
-    FetchHarvestActivitySummaryOk:
-      description: OK
-      headers:
-        X-Http-Request-Id:
-          description: Unique identifier assigned to the request.
-          schema:
-            type: string
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/HarvestActivitySummaryResponse'
-    FetchPlantingActivityPartial:
-      description: Partial Result
-      headers:
-        X-Http-Request-Id:
-          description: Unique identifier assigned to the request.
-          schema:
-            type: string
-        Content-Range:
-          description: Byte range `bytes start-end/total` (https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.16). e.g. bytes 0-5242880/10242880. Downloads larger than 5MiB (5242880 bytes) in size must be downloaded in chunks no larger than 5MiB (5242880 bytes) and no smaller than 1MiB (1048576 bytes). The last chunk could be less than 1MiB (1048576 bytes).
-          schema:
-            type: string
-      content:
-        application/octet-stream:
-          schema:
-            $ref: '#/components/schemas/PlantingActivityContents'
-    FetchScoutingObservationAttachmentContentsPartial:
-      description: Partial Result
-      headers:
-        X-Http-Request-Id:
-          description: Unique identifier assigned to the request.
-          schema:
-            type: string
-        Content-Range:
-          description: Byte range `bytes start-end/total` (https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.16). e.g. bytes 0-5242880/10242880. Downloads larger than 5MiB (5242880 bytes) in size must be downloaded in chunks no larger than 5MiB (5242880 bytes) and no smaller than 1MiB (1048576 bytes). The last chunk could be less than 1MiB (1048576 bytes).
-          schema:
-            type: string
-      content:
-        image/jpeg:
-          schema:
-            $ref: '#/components/schemas/ScoutingObservationAttachmentContents'
-    '404':
-      description: Not Found
-      headers:
-        X-Http-Request-Id:
-          description: Unique identifier assigned to the request.
-          schema:
-            type: string
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    FetchApplicationActivitySummaryOk:
-      description: OK
-      headers:
-        X-Http-Request-Id:
-          description: Unique identifier assigned to the request.
-          schema:
-            type: string
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApplicationActivitySummaryResponse'
-    '503':
-      description: Server Busy
-      headers:
-        X-Http-Request-Id:
-          description: Unique identifier assigned to the request.
-          schema:
-            type: string
-        Retry-After:
-          description: Number of seconds to wait before retrying the request.
-          schema:
-            type: integer
-            format: int32
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    FetchApplicationActivityOk:
-      description: OK
-      headers:
-        X-Http-Request-Id:
-          description: Unique identifier assigned to the request
-          schema:
-            type: string
-        Content-Range:
-          description: Byte range `bytes start-end/total` (https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.16). e.g. bytes 0-5242880/10242880. Downloads larger than 5MiB (5242880 bytes) in size must be downloaded in chunks no larger than 5MiB (5242880 bytes) and no smaller than 1MiB (1048576 bytes). The last chunk could be less than 1MiB (1048576 bytes).
-          schema:
-            type: string
-      content:
-        application/octet-stream:
-          schema:
-            $ref: '#/components/schemas/ApplicationActivityContents'
+            $ref: '#/components/schemas/Empty'
+  parameters:
+    PlantingActivityId:
+      in: path
+      description: Unique identifier of the Planting Activity.
+      name: activityId
+      required: true
+      schema:
+        type: string
+        format: uuid
+    X-Limit:
+      in: header
+      name: X-Limit
+      description: Max number of results to return per batch.  Must be between 1 and 100 inclusive.  Defaults to 100.
+      required: false
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        maximum: 100
+    OptionalResourceOwnerId:
+      in: query
+      description: Optional unique identifier of the resource owner.  If resourceOwnerId is not specified, it defaults to the x-authenticated-user-uuid.
+      name: resourceOwnerId
+      required: false
+      schema:
+        type: string
+        format: uuid
+    ScoutingObservationAttachmentId:
+      in: path
+      description: Unique identifier of the attachment.
+      name: attachmentId
+      required: true
+      schema:
+        type: string
+        format: uuid
+    Range:
+      in: header
+      name: Range
+      description: Byte range `bytes=start-end` (https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.35.1). e.g. bytes=0-1048576. Currently only single range value is supported. Both start and end need to be specified, end value should be greater than start and end - start should not be greater than 5MiB.
+      required: true
+      schema:
+        type: string
+    ScoutingObservationId:
+      in: path
+      description: Unique identifier of the Scouting Observation.
+      name: scoutingObservationId
+      required: true
+      schema:
+        type: string
+        format: uuid
+    X-Next-Token:
+      name: X-Next-Token
+      in: header
+      description: Opaque string which allows for fetching the next batch of results.  Can be used to poll for changes.
+      required: false
+      schema:
+        type: string
+    Accept:
+      in: header
+      name: Accept
+      required: true
+      description: Must be either \*/* or application/octet-stream,application/json
+      schema:
+        type: string
+    HarvestActivityId:
+      in: path
+      description: Unique identifier of the Harvest Activity.
+      name: activityId
+      required: true
+      schema:
+        type: string
+        format: uuid
+    OccurredBefore:
+      in: query
+      description: Optional end time by which to filter layer results. Time must be in ISO 8601 format with time zone, e.g. 2016-05-13T00:00:00Z (https://tools.ietf.org/html/rfc3339). Layers with a start time at or before (inclusive) the specified time. If both occurredAfter and occurredBefore are populated, occurredAfter must be <= occurredBefore.
+      name: occurredBefore
+      required: false
+      schema:
+        type: string
+        format: date-time
+    UpdatedAfter:
+      in: query
+      description: Optional updated time by which to filter layer results. Time must be in ISO 8601 format with time zone, e.g. 2016-05-13T00:00:00Z (https://tools.ietf.org/html/rfc3339). Layers with a modification time at or after (inclusive) the specified time.
+      name: updatedAfter
+      required: false
+      schema:
+        type: string
+        format: date-time
+    OccurredAfter:
+      in: query
+      description: Optional start time by which to filter layer results. Time must be in ISO 8601 format with time zone, e.g. 2016-05-13T00:00:00Z (https://tools.ietf.org/html/rfc3339). Layers with an end time at or after (inclusive) the specified time will match this filter. If both occurredAfter and occurredBefore are populated, occurredAfter must be <= occurredBefore.
+      name: occurredAfter
+      required: false
+      schema:
+        type: string
+        format: date-time
+    ApplicationActivityId:
+      in: path
+      description: Unique identifier of the Application Activity.
+      name: activityId
+      required: true
+      schema:
+        type: string
+        format: uuid
   securitySchemes:
     oauth2_authorization_code:
       description: 'Log in with FieldView OAuth2 provider (Authorization Code Grant). Used to authorize the client (partner) and

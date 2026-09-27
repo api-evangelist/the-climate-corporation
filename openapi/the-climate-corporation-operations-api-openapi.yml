@@ -47,19 +47,8 @@ paths:
           $ref: '#/components/responses/503'
 components:
   responses:
-    '404':
-      description: Not Found
-      headers:
-        X-Http-Request-Id:
-          description: Unique identifier assigned to the request.
-          schema:
-            type: string
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    '500':
-      description: Internal Server Error
+    '400':
+      description: Bad Input
       headers:
         X-Http-Request-Id:
           description: Unique identifier assigned to the request.
@@ -80,8 +69,56 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
+    FetchOperationsOk:
+      description: Returns the requested operations.
+      headers:
+        X-Http-Request-Id:
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Operations'
+    '503':
+      description: Server Busy
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+        Retry-After:
+          description: Number of seconds to wait before retrying the request.
+          schema:
+            type: integer
+            format: int32
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '404':
+      description: Not Found
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
     '429':
       description: Too Many Requests
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '500':
+      description: Internal Server Error
       headers:
         X-Http-Request-Id:
           description: Unique identifier assigned to the request.
@@ -102,62 +139,17 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
-    '503':
-      description: Server Busy
-      headers:
-        X-Http-Request-Id:
-          description: Unique identifier assigned to the request.
-          schema:
-            type: string
-        Retry-After:
-          description: Number of seconds to wait before retrying the request.
-          schema:
-            type: integer
-            format: int32
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    FetchOperationsOk:
-      description: Returns the requested operations.
-      headers:
-        X-Http-Request-Id:
-          schema:
-            type: string
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Operations'
-    '400':
-      description: Bad Input
-      headers:
-        X-Http-Request-Id:
-          description: Unique identifier assigned to the request.
-          schema:
-            type: string
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
   schemas:
-    Error:
+    Operations:
       type: object
+      description: A batch of operation results.
+      required:
+      - results
       properties:
-        error:
-          type: object
-          required:
-          - id
-          - code
-          - message
-          properties:
-            id:
-              type: string
-              format: uuid
-            code:
-              type: string
-            message:
-              type: string
-              description: Description of the error encountered.
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Operation'
     Operation:
       type: object
       description: Logical representation of an operation with a name and resource owner.
@@ -181,16 +173,24 @@ components:
         id: 00000000-0000-0000-0000-000000000000
         name: Back Forty
         resourceOwnerId: 00000000-0000-0000-0000-000000000000
-    Operations:
+    Error:
       type: object
-      description: A batch of operation results.
-      required:
-      - results
       properties:
-        results:
-          type: array
-          items:
-            $ref: '#/components/schemas/Operation'
+        error:
+          type: object
+          required:
+          - id
+          - code
+          - message
+          properties:
+            id:
+              type: string
+              format: uuid
+            code:
+              type: string
+            message:
+              type: string
+              description: Description of the error encountered.
   parameters:
     OptionalResourceOwnerIdList:
       in: query

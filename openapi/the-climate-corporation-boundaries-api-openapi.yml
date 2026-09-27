@@ -118,32 +118,16 @@ paths:
               $ref: '#/components/schemas/BoundaryUpload'
 components:
   schemas:
-    Error:
-      type: object
-      properties:
-        error:
-          type: object
-          required:
-          - id
-          - code
-          - message
-          properties:
-            id:
-              type: string
-              format: uuid
-            code:
-              type: string
-            message:
-              type: string
-              description: Description of the error encountered.
-    UploadedBoundaryId:
-      description: Unique identifier of a successfully uploaded boundary
+    BoundaryProperties:
+      description: Properties map.
       required:
-      - id
+      - area
+      - centroid
       properties:
-        id:
-          type: string
-          format: uuid
+        area:
+          $ref: '#/components/schemas/Area'
+        centroid:
+          $ref: '#/components/schemas/Point'
     Geometry:
       description: GeoJSON
       required:
@@ -165,6 +149,37 @@ components:
         coordinates:
         - 0
         - 0
+    Area:
+      description: Area with units. Units are always "hectare".
+      required:
+      - q
+      - u
+      properties:
+        q:
+          type: number
+          format: float
+        u:
+          type: string
+      example:
+        q: 1
+        u: hectare
+    Point:
+      required:
+      - coordinates
+      - type
+      properties:
+        coordinates:
+          type: array
+          items:
+            type: number
+            format: float
+        type:
+          type: string
+      example:
+        type: Point
+        coordinates:
+        - -122.2
+        - 38.1
     Boundaries:
       description: A batch of boundary results
       required:
@@ -179,6 +194,13 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Boundary'
+    BoundaryUpload:
+      description: Arbitrary boundary in a geometry map
+      required:
+      - geometry
+      properties:
+        geometry:
+          $ref: '#/components/schemas/Geometry'
     Boundary:
       description: Arbitrary boundary.  GeoJSON Feature.
       required:
@@ -198,37 +220,6 @@ components:
           $ref: '#/components/schemas/Geometry'
         properties:
           $ref: '#/components/schemas/BoundaryProperties'
-    Area:
-      description: Area with units. Units are always "hectare".
-      required:
-      - q
-      - u
-      properties:
-        q:
-          type: number
-          format: float
-        u:
-          type: string
-      example:
-        q: 1
-        u: hectare
-    BoundaryUpload:
-      description: Arbitrary boundary in a geometry map
-      required:
-      - geometry
-      properties:
-        geometry:
-          $ref: '#/components/schemas/Geometry'
-    BoundaryProperties:
-      description: Properties map.
-      required:
-      - area
-      - centroid
-      properties:
-        area:
-          $ref: '#/components/schemas/Area'
-        centroid:
-          $ref: '#/components/schemas/Point'
     BoundariesQuery:
       type: object
       required:
@@ -240,71 +231,60 @@ components:
             description: Unique identifier for the boundary.
             type: string
             format: uuid
-    Point:
+    UploadedBoundaryId:
+      description: Unique identifier of a successfully uploaded boundary
       required:
-      - coordinates
-      - type
+      - id
       properties:
-        coordinates:
-          type: array
-          items:
-            type: number
-            format: float
-        type:
+        id:
           type: string
-      example:
-        type: Point
-        coordinates:
-        - -122.2
-        - 38.1
+          format: uuid
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          required:
+          - id
+          - code
+          - message
+          properties:
+            id:
+              type: string
+              format: uuid
+            code:
+              type: string
+            message:
+              type: string
+              description: Description of the error encountered.
+  parameters:
+    BoundaryId:
+      in: path
+      description: Unique identifier of the Boundary
+      name: boundaryId
+      required: true
+      schema:
+        type: string
+        format: uuid
   responses:
-    '403':
-      description: Forbidden
+    '503':
+      description: Server Busy
       headers:
         X-Http-Request-Id:
           description: Unique identifier assigned to the request.
           schema:
             type: string
+        Retry-After:
+          description: Number of seconds to wait before retrying the request.
+          schema:
+            type: integer
+            format: int32
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
-    FetchBoundaryByIdOk:
-      description: OK
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Boundary'
-    '429':
-      description: Too Many Requests
-      headers:
-        X-Http-Request-Id:
-          description: Unique identifier assigned to the request.
-          schema:
-            type: string
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    FetchBoundariesOk:
-      description: OK
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Boundaries'
-    '401':
-      description: Unauthorized
-      headers:
-        X-Http-Request-Id:
-          description: Unique identifier assigned to the request.
-          schema:
-            type: string
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    '400':
-      description: Bad Input
+    '404':
+      description: Not Found
       headers:
         X-Http-Request-Id:
           description: Unique identifier assigned to the request.
@@ -325,14 +305,25 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
+    '429':
+      description: Too Many Requests
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
     UploadBoundaryOk:
       description: OK
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/UploadedBoundaryId'
-    '404':
-      description: Not Found
+    '401':
+      description: Unauthorized
       headers:
         X-Http-Request-Id:
           description: Unique identifier assigned to the request.
@@ -342,31 +333,40 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
-    '503':
-      description: Server Busy
+    '403':
+      description: Forbidden
       headers:
         X-Http-Request-Id:
           description: Unique identifier assigned to the request.
           schema:
             type: string
-        Retry-After:
-          description: Number of seconds to wait before retrying the request.
-          schema:
-            type: integer
-            format: int32
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
-  parameters:
-    BoundaryId:
-      in: path
-      description: Unique identifier of the Boundary
-      name: boundaryId
-      required: true
-      schema:
-        type: string
-        format: uuid
+    FetchBoundariesOk:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Boundaries'
+    '400':
+      description: Bad Input
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    FetchBoundaryByIdOk:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Boundary'
   securitySchemes:
     oauth2_authorization_code:
       description: 'Log in with FieldView OAuth2 provider (Authorization Code Grant). Used to authorize the client (partner) and

@@ -82,121 +82,51 @@ paths:
         '503':
           $ref: '#/components/responses/503'
 components:
-  parameters:
-    X-Limit:
-      in: header
-      name: X-Limit
-      description: Max number of results to return per batch.  Must be between 1 and 100 inclusive.  Defaults to 100.
-      required: false
-      schema:
-        type: integer
-        format: int32
-        minimum: 1
-        maximum: 100
-    FieldId:
-      in: path
-      description: Unique identifier of the Field.
-      name: fieldId
-      required: true
-      schema:
-        type: string
-        format: uuid
-    X-Next-Token:
-      name: X-Next-Token
-      in: header
-      description: Opaque string which allows for fetching the next batch of results.  Can be used to poll for changes.
-      required: false
-      schema:
-        type: string
-    OptionalFieldNamePrefix:
-      in: query
-      description: Optional prefix filter for field name. Must be at least 3 characters.
-      name: fieldName
-      required: false
-      schema:
-        type: string
-  schemas:
-    Error:
-      type: object
-      properties:
-        error:
-          type: object
-          required:
-          - id
-          - code
-          - message
-          properties:
-            id:
-              type: string
-              format: uuid
-            code:
-              type: string
-            message:
-              type: string
-              description: Description of the error encountered.
-    Fields:
-      description: A batch of field results
-      required:
-      - results
-      properties:
-        results:
-          type: array
-          items:
-            $ref: '#/components/schemas/Field'
-    Parent:
-      description: A minimal set of attributes regarding the parent of a farm organization.
-      required:
-      - id
-      - type
-      properties:
-        id:
-          description: Unique identifier for the parent of a farm organization.
-          type: string
-          format: uuid
-        type:
-          description: Type of the parent of a farm organization.
-          type: string
-          enum:
-          - farm
-    Field:
-      description: Logical representation of a Field with a name.  Spatial attributes of the Field are provided in the Boundary.
-      required:
-      - id
-      - name
-      - boundaryId
-      - resourceOwnerId
-      - parent
-      properties:
-        id:
-          description: Unique identifier for a Field.
-          type: string
-          format: uuid
-        name:
-          description: Name of the Field.
-          type: string
-        boundaryId:
-          description: Unique identifier for the current Field's Boundary.
-          type: string
-          format: uuid
-        resourceOwnerId:
-          description: Unique identifier of the resource owner that owns the Field.
-          type: string
-          format: uuid
-        parent:
-          $ref: '#/components/schemas/Parent'
-      example:
-        id: 00000000-0000-0000-0000-000000000000
-        name: Back Forty
-        boundaryId: 00000000-0000-0000-0000-000000000000
-        resourceOwnerId: 00000000-0000-0000-0000-000000000000
-        parent:
-          id: 00000000-0000-0000-0000-000000000000
-          type: farm
-    Empty:
-      type: object
   responses:
-    '403':
-      description: Forbidden
+    FetchFieldsPartial:
+      description: Partial Result
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+        X-Next-Token:
+          description: Token used to fetch next batch of results.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Fields'
+    '503':
+      description: Server Busy
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+        Retry-After:
+          description: Number of seconds to wait before retrying the request.
+          schema:
+            type: integer
+            format: int32
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '404':
+      description: Not Found
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '500':
+      description: Internal Server Error
       headers:
         X-Http-Request-Id:
           description: Unique identifier assigned to the request.
@@ -217,38 +147,29 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
-    '304':
-      description: Not Modified
-      headers:
-        X-Http-Request-Id:
-          description: Unique identifier assigned to the request.
-          schema:
-            type: string
-        X-Next-Token:
-          description: A token which may be used to poll for updates.
-          schema:
-            type: string
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Empty'
-    FetchFieldsPartial:
-      description: Partial Result
-      headers:
-        X-Http-Request-Id:
-          description: Unique identifier assigned to the request.
-          schema:
-            type: string
-        X-Next-Token:
-          description: Token used to fetch next batch of results.
-          schema:
-            type: string
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Fields'
     '401':
       description: Unauthorized
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    FetchFieldByIdOk:
+      description: Returns the requested Field.
+      headers:
+        X-Http-Request-Id:
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Field'
+    '403':
+      description: Forbidden
       headers:
         X-Http-Request-Id:
           description: Unique identifier assigned to the request.
@@ -284,54 +205,133 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
-    '500':
-      description: Internal Server Error
+    '304':
+      description: Not Modified
       headers:
         X-Http-Request-Id:
           description: Unique identifier assigned to the request.
           schema:
             type: string
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    FetchFieldByIdOk:
-      description: Returns the requested Field.
-      headers:
-        X-Http-Request-Id:
+        X-Next-Token:
+          description: A token which may be used to poll for updates.
           schema:
             type: string
       content:
         application/json:
           schema:
+            $ref: '#/components/schemas/Empty'
+  schemas:
+    Field:
+      description: Logical representation of a Field with a name.  Spatial attributes of the Field are provided in the Boundary.
+      required:
+      - id
+      - name
+      - boundaryId
+      - resourceOwnerId
+      - parent
+      properties:
+        id:
+          description: Unique identifier for a Field.
+          type: string
+          format: uuid
+        name:
+          description: Name of the Field.
+          type: string
+        boundaryId:
+          description: Unique identifier for the current Field's Boundary.
+          type: string
+          format: uuid
+        resourceOwnerId:
+          description: Unique identifier of the resource owner that owns the Field.
+          type: string
+          format: uuid
+        parent:
+          $ref: '#/components/schemas/Parent'
+      example:
+        id: 00000000-0000-0000-0000-000000000000
+        name: Back Forty
+        boundaryId: 00000000-0000-0000-0000-000000000000
+        resourceOwnerId: 00000000-0000-0000-0000-000000000000
+        parent:
+          id: 00000000-0000-0000-0000-000000000000
+          type: farm
+    Fields:
+      description: A batch of field results
+      required:
+      - results
+      properties:
+        results:
+          type: array
+          items:
             $ref: '#/components/schemas/Field'
-    '404':
-      description: Not Found
-      headers:
-        X-Http-Request-Id:
-          description: Unique identifier assigned to the request.
-          schema:
-            type: string
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    '503':
-      description: Server Busy
-      headers:
-        X-Http-Request-Id:
-          description: Unique identifier assigned to the request.
-          schema:
-            type: string
-        Retry-After:
-          description: Number of seconds to wait before retrying the request.
-          schema:
-            type: integer
-            format: int32
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
+    Empty:
+      type: object
+    Parent:
+      description: A minimal set of attributes regarding the parent of a farm organization.
+      required:
+      - id
+      - type
+      properties:
+        id:
+          description: Unique identifier for the parent of a farm organization.
+          type: string
+          format: uuid
+        type:
+          description: Type of the parent of a farm organization.
+          type: string
+          enum:
+          - farm
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          required:
+          - id
+          - code
+          - message
+          properties:
+            id:
+              type: string
+              format: uuid
+            code:
+              type: string
+            message:
+              type: string
+              description: Description of the error encountered.
+  parameters:
+    X-Limit:
+      in: header
+      name: X-Limit
+      description: Max number of results to return per batch.  Must be between 1 and 100 inclusive.  Defaults to 100.
+      required: false
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        maximum: 100
+    X-Next-Token:
+      name: X-Next-Token
+      in: header
+      description: Opaque string which allows for fetching the next batch of results.  Can be used to poll for changes.
+      required: false
+      schema:
+        type: string
+    FieldId:
+      in: path
+      description: Unique identifier of the Field.
+      name: fieldId
+      required: true
+      schema:
+        type: string
+        format: uuid
+    OptionalFieldNamePrefix:
+      in: query
+      description: Optional prefix filter for field name. Must be at least 3 characters.
+      name: fieldName
+      required: false
+      schema:
+        type: string
   securitySchemes:
     oauth2_authorization_code:
       description: 'Log in with FieldView OAuth2 provider (Authorization Code Grant). Used to authorize the client (partner) and
