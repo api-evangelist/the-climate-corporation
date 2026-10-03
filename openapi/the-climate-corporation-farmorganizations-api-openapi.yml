@@ -48,19 +48,8 @@ paths:
           $ref: '#/components/responses/503'
 components:
   responses:
-    '400':
-      description: Bad Input
-      headers:
-        X-Http-Request-Id:
-          description: Unique identifier assigned to the request.
-          schema:
-            type: string
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    '403':
-      description: Forbidden
+    '401':
+      description: Unauthorized
       headers:
         X-Http-Request-Id:
           description: Unique identifier assigned to the request.
@@ -80,35 +69,8 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/FarmOrganization'
-    '503':
-      description: Server Busy
-      headers:
-        X-Http-Request-Id:
-          description: Unique identifier assigned to the request.
-          schema:
-            type: string
-        Retry-After:
-          description: Number of seconds to wait before retrying the request.
-          schema:
-            type: integer
-            format: int32
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
     '404':
       description: Not Found
-      headers:
-        X-Http-Request-Id:
-          description: Unique identifier assigned to the request.
-          schema:
-            type: string
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    '429':
-      description: Too Many Requests
       headers:
         X-Http-Request-Id:
           description: Unique identifier assigned to the request.
@@ -129,8 +91,46 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
-    '401':
-      description: Unauthorized
+    '429':
+      description: Too Many Requests
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '503':
+      description: Server Busy
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+        Retry-After:
+          description: Number of seconds to wait before retrying the request.
+          schema:
+            type: integer
+            format: int32
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '403':
+      description: Forbidden
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '400':
+      description: Bad Input
       headers:
         X-Http-Request-Id:
           description: Unique identifier assigned to the request.
@@ -141,14 +141,6 @@ components:
           schema:
             $ref: '#/components/schemas/Error'
   parameters:
-    FarmOrganizationId:
-      in: path
-      description: Unique identifier of the farm organization.
-      name: farmOrganizationId
-      required: true
-      schema:
-        type: string
-        format: uuid
     FarmOrganizationType:
       in: path
       description: Type of the farm organization.
@@ -158,7 +150,33 @@ components:
         type: string
         enum:
         - farm
+    FarmOrganizationId:
+      in: path
+      description: Unique identifier of the farm organization.
+      name: farmOrganizationId
+      required: true
+      schema:
+        type: string
+        format: uuid
   schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          required:
+          - id
+          - code
+          - message
+          properties:
+            id:
+              type: string
+              format: uuid
+            code:
+              type: string
+            message:
+              type: string
+              description: Description of the error encountered.
     FarmOrganization:
       description: Logical representation of a farm organization with a name and type.
       required:
@@ -182,24 +200,6 @@ components:
         id: 00000000-0000-0000-0000-000000000000
         name: Back Forty
         type: farm
-    Error:
-      type: object
-      properties:
-        error:
-          type: object
-          required:
-          - id
-          - code
-          - message
-          properties:
-            id:
-              type: string
-              format: uuid
-            code:
-              type: string
-            message:
-              type: string
-              description: Description of the error encountered.
   securitySchemes:
     oauth2_authorization_code:
       description: 'Log in with FieldView OAuth2 provider (Authorization Code Grant). Used to authorize the client (partner) and

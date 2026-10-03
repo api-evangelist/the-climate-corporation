@@ -39,51 +39,22 @@ paths:
         '500':
           $ref: '#/components/responses/500'
 components:
-  schemas:
-    ResourceOwner:
-      type: object
-      required:
-      - id
-      - name
-      - email
-      properties:
-        id:
-          type: string
-          format: uuid
-        name:
-          type: string
-        email:
-          type: string
-    Error:
-      type: object
-      properties:
-        error:
-          type: object
-          required:
-          - id
-          - code
-          - message
-          properties:
-            id:
-              type: string
-              format: uuid
-            code:
-              type: string
-            message:
-              type: string
-              description: Description of the error encountered.
+  parameters:
+    ResourceOwnerId:
+      in: path
+      description: Unique identifier of the resource owner.
+      name: resourceOwnerId
+      required: true
+      schema:
+        type: string
+        format: uuid
   responses:
-    '400':
-      description: Bad Input
-      headers:
-        X-Http-Request-Id:
-          description: Unique identifier assigned to the request.
-          schema:
-            type: string
+    FetchResourceOwnerOk:
+      description: OK
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            $ref: '#/components/schemas/ResourceOwner'
     '404':
       description: Not Found
       headers:
@@ -106,21 +77,50 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
-    FetchResourceOwnerOk:
-      description: OK
+    '400':
+      description: Bad Input
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ResourceOwner'
-  parameters:
-    ResourceOwnerId:
-      in: path
-      description: Unique identifier of the resource owner.
-      name: resourceOwnerId
-      required: true
-      schema:
-        type: string
-        format: uuid
+            $ref: '#/components/schemas/Error'
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          required:
+          - id
+          - code
+          - message
+          properties:
+            id:
+              type: string
+              format: uuid
+            code:
+              type: string
+            message:
+              type: string
+              description: Description of the error encountered.
+    ResourceOwner:
+      type: object
+      required:
+      - id
+      - name
+      - email
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        email:
+          type: string
   securitySchemes:
     oauth2_authorization_code:
       description: 'Log in with FieldView OAuth2 provider (Authorization Code Grant). Used to authorize the client (partner) and
