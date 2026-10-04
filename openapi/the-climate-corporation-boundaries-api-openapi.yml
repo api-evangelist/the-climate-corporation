@@ -118,12 +118,17 @@ paths:
               $ref: '#/components/schemas/BoundaryUpload'
 components:
   responses:
-    FetchBoundaryByIdOk:
-      description: OK
+    '401':
+      description: Unauthorized
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Boundary'
+            $ref: '#/components/schemas/Error'
     '404':
       description: Not Found
       headers:
@@ -135,8 +140,36 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
+    FetchBoundariesOk:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Boundaries'
+    '400':
+      description: Bad Input
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
     '429':
       description: Too Many Requests
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '500':
+      description: Internal Server Error
       headers:
         X-Http-Request-Id:
           description: Unique identifier assigned to the request.
@@ -162,17 +195,12 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
-    '400':
-      description: Bad Input
-      headers:
-        X-Http-Request-Id:
-          description: Unique identifier assigned to the request.
-          schema:
-            type: string
+    UploadBoundaryOk:
+      description: OK
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            $ref: '#/components/schemas/UploadedBoundaryId'
     '403':
       description: Forbidden
       headers:
@@ -184,51 +212,42 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
-    '401':
-      description: Unauthorized
-      headers:
-        X-Http-Request-Id:
-          description: Unique identifier assigned to the request.
-          schema:
-            type: string
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    '500':
-      description: Internal Server Error
-      headers:
-        X-Http-Request-Id:
-          description: Unique identifier assigned to the request.
-          schema:
-            type: string
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    FetchBoundariesOk:
+    FetchBoundaryByIdOk:
       description: OK
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Boundaries'
-    UploadBoundaryOk:
-      description: OK
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/UploadedBoundaryId'
+            $ref: '#/components/schemas/Boundary'
   schemas:
-    BoundaryProperties:
-      description: Properties map.
+    BoundariesQuery:
+      type: object
       required:
-      - area
-      - centroid
+      - ids
       properties:
-        area:
-          $ref: '#/components/schemas/Area'
-        centroid:
-          $ref: '#/components/schemas/Point'
+        ids:
+          type: array
+          items:
+            description: Unique identifier for the boundary.
+            type: string
+            format: uuid
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          required:
+          - id
+          - code
+          - message
+          properties:
+            id:
+              type: string
+              format: uuid
+            code:
+              type: string
+            message:
+              type: string
+              description: Description of the error encountered.
     Point:
       required:
       - coordinates
@@ -246,6 +265,30 @@ components:
         coordinates:
         - -122.2
         - 38.1
+    Boundaries:
+      description: A batch of boundary results
+      required:
+      - type
+      - features
+      properties:
+        type:
+          type: string
+          enum:
+          - FeatureCollection
+        features:
+          type: array
+          items:
+            $ref: '#/components/schemas/Boundary'
+    BoundaryProperties:
+      description: Properties map.
+      required:
+      - area
+      - centroid
+      properties:
+        area:
+          $ref: '#/components/schemas/Area'
+        centroid:
+          $ref: '#/components/schemas/Point'
     Boundary:
       description: Arbitrary boundary.  GeoJSON Feature.
       required:
@@ -265,70 +308,6 @@ components:
           $ref: '#/components/schemas/Geometry'
         properties:
           $ref: '#/components/schemas/BoundaryProperties'
-    Boundaries:
-      description: A batch of boundary results
-      required:
-      - type
-      - features
-      properties:
-        type:
-          type: string
-          enum:
-          - FeatureCollection
-        features:
-          type: array
-          items:
-            $ref: '#/components/schemas/Boundary'
-    BoundaryUpload:
-      description: Arbitrary boundary in a geometry map
-      required:
-      - geometry
-      properties:
-        geometry:
-          $ref: '#/components/schemas/Geometry'
-    Error:
-      type: object
-      properties:
-        error:
-          type: object
-          required:
-          - id
-          - code
-          - message
-          properties:
-            id:
-              type: string
-              format: uuid
-            code:
-              type: string
-            message:
-              type: string
-              description: Description of the error encountered.
-    Area:
-      description: Area with units. Units are always "hectare".
-      required:
-      - q
-      - u
-      properties:
-        q:
-          type: number
-          format: float
-        u:
-          type: string
-      example:
-        q: 1
-        u: hectare
-    BoundariesQuery:
-      type: object
-      required:
-      - ids
-      properties:
-        ids:
-          type: array
-          items:
-            description: Unique identifier for the boundary.
-            type: string
-            format: uuid
     Geometry:
       description: GeoJSON
       required:
@@ -350,6 +329,27 @@ components:
         coordinates:
         - 0
         - 0
+    Area:
+      description: Area with units. Units are always "hectare".
+      required:
+      - q
+      - u
+      properties:
+        q:
+          type: number
+          format: float
+        u:
+          type: string
+      example:
+        q: 1
+        u: hectare
+    BoundaryUpload:
+      description: Arbitrary boundary in a geometry map
+      required:
+      - geometry
+      properties:
+        geometry:
+          $ref: '#/components/schemas/Geometry'
     UploadedBoundaryId:
       description: Unique identifier of a successfully uploaded boundary
       required:

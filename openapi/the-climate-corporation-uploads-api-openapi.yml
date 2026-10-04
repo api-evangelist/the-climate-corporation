@@ -171,7 +171,130 @@ paths:
             schema:
               $ref: '#/components/schemas/UploadStatusQuery'
 components:
+  responses:
+    '401':
+      description: Unauthorized
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '404':
+      description: Not Found
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    PostUploadOk:
+      description: Returns a new upload with ID used to PUT file contents.
+      headers:
+        X-Http-Request-Id:
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CreatedUpload'
+    '400':
+      description: Bad Input
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '429':
+      description: Too Many Requests
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    FetchUploadStatusesOk:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UploadStatuses'
+    '500':
+      description: Internal Server Error
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '503':
+      description: Server Busy
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+        Retry-After:
+          description: Number of seconds to wait before retrying the request.
+          schema:
+            type: integer
+            format: int32
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    FetchUploadStatusByIdOk:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UploadStatus'
+    '403':
+      description: Forbidden
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '204':
+      description: No Content
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
   schemas:
+    UploadStatusQuery:
+      type: object
+      required:
+      - ids
+      properties:
+        ids:
+          type: array
+          items:
+            description: Unique identifier for the upload.
+            type: string
+            format: uuid
     UploadStatuses:
       type: object
       required:
@@ -181,9 +304,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/UploadStatus'
-    Metadata:
-      type: object
-      additionalProperties: true
     Error:
       type: object
       properties:
@@ -202,6 +322,31 @@ components:
             message:
               type: string
               description: Description of the error encountered.
+    UploadStatus:
+      type: object
+      required:
+      - id
+      - status
+      properties:
+        id:
+          description: Unique identifier for the upload.
+          type: string
+          format: uuid
+        status:
+          description: "Current status of the upload:\n  * `UPLOADING` - Uploading has started, parts are still coming in.\n  * `INVALID` - Upload has failed validity check.\n  * `PENDING` - Upload has been received by Climate and is being processed.\n  * `INBOX` - The upload is awaiting user acceptance in their Data Inbox.\n  * `DECLINED` - The user has declined the upload in their Data Inbox.\n  * `IMPORTING` - The user has accepted the upload and it is being imported into their account.\n  * `SUCCESS` - The upload has been successfully imported.\n"
+          type: string
+          enum:
+          - UPLOADING
+          - INVALID
+          - PENDING
+          - INBOX
+          - DECLINED
+          - IMPORTING
+          - SUCCESS
+    CreatedUpload:
+      type: string
+      format: uuid
+      description: Successfully created upload request
     Upload:
       type: object
       description: Client request to upload data for a user.
@@ -239,173 +384,14 @@ components:
           description: Content size in bytes
         metadata:
           $ref: '#/components/schemas/Metadata'
-    UploadStatus:
+    Metadata:
       type: object
-      required:
-      - id
-      - status
-      properties:
-        id:
-          description: Unique identifier for the upload.
-          type: string
-          format: uuid
-        status:
-          description: "Current status of the upload:\n  * `UPLOADING` - Uploading has started, parts are still coming in.\n  * `INVALID` - Upload has failed validity check.\n  * `PENDING` - Upload has been received by Climate and is being processed.\n  * `INBOX` - The upload is awaiting user acceptance in their Data Inbox.\n  * `DECLINED` - The user has declined the upload in their Data Inbox.\n  * `IMPORTING` - The user has accepted the upload and it is being imported into their account.\n  * `SUCCESS` - The upload has been successfully imported.\n"
-          type: string
-          enum:
-          - UPLOADING
-          - INVALID
-          - PENDING
-          - INBOX
-          - DECLINED
-          - IMPORTING
-          - SUCCESS
-    UploadStatusQuery:
-      type: object
-      required:
-      - ids
-      properties:
-        ids:
-          type: array
-          items:
-            description: Unique identifier for the upload.
-            type: string
-            format: uuid
-    CreatedUpload:
-      type: string
-      format: uuid
-      description: Successfully created upload request
-  responses:
-    '404':
-      description: Not Found
-      headers:
-        X-Http-Request-Id:
-          description: Unique identifier assigned to the request.
-          schema:
-            type: string
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    PostUploadOk:
-      description: Returns a new upload with ID used to PUT file contents.
-      headers:
-        X-Http-Request-Id:
-          schema:
-            type: string
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/CreatedUpload'
-    '204':
-      description: No Content
-      headers:
-        X-Http-Request-Id:
-          description: Unique identifier assigned to the request.
-          schema:
-            type: string
-    '429':
-      description: Too Many Requests
-      headers:
-        X-Http-Request-Id:
-          description: Unique identifier assigned to the request.
-          schema:
-            type: string
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    '503':
-      description: Server Busy
-      headers:
-        X-Http-Request-Id:
-          description: Unique identifier assigned to the request.
-          schema:
-            type: string
-        Retry-After:
-          description: Number of seconds to wait before retrying the request.
-          schema:
-            type: integer
-            format: int32
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    '400':
-      description: Bad Input
-      headers:
-        X-Http-Request-Id:
-          description: Unique identifier assigned to the request.
-          schema:
-            type: string
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    FetchUploadStatusByIdOk:
-      description: OK
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/UploadStatus'
-    '403':
-      description: Forbidden
-      headers:
-        X-Http-Request-Id:
-          description: Unique identifier assigned to the request.
-          schema:
-            type: string
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    FetchUploadStatusesOk:
-      description: OK
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/UploadStatuses'
-    '401':
-      description: Unauthorized
-      headers:
-        X-Http-Request-Id:
-          description: Unique identifier assigned to the request.
-          schema:
-            type: string
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    '500':
-      description: Internal Server Error
-      headers:
-        X-Http-Request-Id:
-          description: Unique identifier assigned to the request.
-          schema:
-            type: string
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
+      additionalProperties: true
   parameters:
-    X-Recipient-Email:
-      in: header
-      name: X-Recipient-Email
-      description: Email address associated with a Climate account, used when to sending to another user.
-      required: false
-      schema:
-        type: string
     ContentRange:
       in: header
       name: Content-Range
       description: Byte range `bytes start-end/total` (https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.16). e.g. bytes 0-5242880/10242880. Downloads larger than 5MiB (5242880 bytes) in size must be downloaded in chunks no larger than 5MiB (5242880 bytes) and no smaller than 1MiB (1048576 bytes). The last chunk could be less than 1MiB (1048576 bytes).
-      required: true
-      schema:
-        type: string
-    BinaryContentType:
-      in: header
-      name: Content-Type
-      description: Must be `application/octet-stream`
       required: true
       schema:
         type: string
@@ -417,6 +403,20 @@ components:
       schema:
         type: string
         format: uuid
+    X-Recipient-Email:
+      in: header
+      name: X-Recipient-Email
+      description: Email address associated with a Climate account, used when to sending to another user.
+      required: false
+      schema:
+        type: string
+    BinaryContentType:
+      in: header
+      name: Content-Type
+      description: Must be `application/octet-stream`
+      required: true
+      schema:
+        type: string
   securitySchemes:
     oauth2_authorization_code:
       description: 'Log in with FieldView OAuth2 provider (Authorization Code Grant). Used to authorize the client (partner) and

@@ -39,55 +39,6 @@ paths:
         '500':
           $ref: '#/components/responses/500'
 components:
-  parameters:
-    ResourceOwnerId:
-      in: path
-      description: Unique identifier of the resource owner.
-      name: resourceOwnerId
-      required: true
-      schema:
-        type: string
-        format: uuid
-  responses:
-    FetchResourceOwnerOk:
-      description: OK
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ResourceOwner'
-    '404':
-      description: Not Found
-      headers:
-        X-Http-Request-Id:
-          description: Unique identifier assigned to the request.
-          schema:
-            type: string
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    '500':
-      description: Internal Server Error
-      headers:
-        X-Http-Request-Id:
-          description: Unique identifier assigned to the request.
-          schema:
-            type: string
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    '400':
-      description: Bad Input
-      headers:
-        X-Http-Request-Id:
-          description: Unique identifier assigned to the request.
-          schema:
-            type: string
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
   schemas:
     Error:
       type: object
@@ -121,6 +72,55 @@ components:
           type: string
         email:
           type: string
+  responses:
+    '400':
+      description: Bad Input
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '404':
+      description: Not Found
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    FetchResourceOwnerOk:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ResourceOwner'
+    '500':
+      description: Internal Server Error
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  parameters:
+    ResourceOwnerId:
+      in: path
+      description: Unique identifier of the resource owner.
+      name: resourceOwnerId
+      required: true
+      schema:
+        type: string
+        format: uuid
   securitySchemes:
     oauth2_authorization_code:
       description: 'Log in with FieldView OAuth2 provider (Authorization Code Grant). Used to authorize the client (partner) and

@@ -185,21 +185,17 @@ paths:
           $ref: '#/components/responses/503'
 components:
   responses:
-    '304':
-      description: Not Modified
+    '401':
+      description: Unauthorized
       headers:
         X-Http-Request-Id:
           description: Unique identifier assigned to the request.
           schema:
             type: string
-        X-Next-Token:
-          description: A token which may be used to poll for updates.
-          schema:
-            type: string
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Empty'
+            $ref: '#/components/schemas/Error'
     '404':
       description: Not Found
       headers:
@@ -211,7 +207,7 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
-    PostExportOk:
+    FetchExportStatusByIdOk:
       description: OK
       headers:
         X-Http-Request-Id:
@@ -221,16 +217,9 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/CreatedExport'
-    '204':
-      description: No Content
-      headers:
-        X-Http-Request-Id:
-          description: Unique identifier assigned to the request.
-          schema:
-            type: string
-    ReportGone:
-      description: Gone (Report is expired)
+            $ref: '#/components/schemas/ExportStatus'
+    '416':
+      description: Range Not Satisfiable
       headers:
         X-Http-Request-Id:
           description: Unique identifier assigned to the request.
@@ -255,8 +244,8 @@ components:
         application/octet-stream:
           schema:
             $ref: '#/components/schemas/ExportContents'
-    FetchExportStatusByIdOk:
-      description: OK
+    '400':
+      description: Bad Input
       headers:
         X-Http-Request-Id:
           description: Unique identifier assigned to the request.
@@ -265,9 +254,35 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ExportStatus'
+            $ref: '#/components/schemas/Error'
     '429':
       description: Too Many Requests
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '304':
+      description: Not Modified
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+        X-Next-Token:
+          description: A token which may be used to poll for updates.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Empty'
+    '500':
+      description: Internal Server Error
       headers:
         X-Http-Request-Id:
           description: Unique identifier assigned to the request.
@@ -293,30 +308,8 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
-    '400':
-      description: Bad Input
-      headers:
-        X-Http-Request-Id:
-          description: Unique identifier assigned to the request.
-          schema:
-            type: string
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    '416':
-      description: Range Not Satisfiable
-      headers:
-        X-Http-Request-Id:
-          description: Unique identifier assigned to the request.
-          schema:
-            type: string
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    '403':
-      description: Forbidden
+    ReportGone:
+      description: Gone (Report is expired)
       headers:
         X-Http-Request-Id:
           description: Unique identifier assigned to the request.
@@ -337,8 +330,19 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
-    '401':
-      description: Unauthorized
+    PostExportOk:
+      description: OK
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CreatedExport'
+    '403':
+      description: Forbidden
       headers:
         X-Http-Request-Id:
           description: Unique identifier assigned to the request.
@@ -348,41 +352,36 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
-    '500':
-      description: Internal Server Error
+    '204':
+      description: No Content
       headers:
         X-Http-Request-Id:
           description: Unique identifier assigned to the request.
           schema:
             type: string
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-  parameters:
-    Accept:
-      in: header
-      name: Accept
-      required: true
-      description: Must be either \*/* or application/octet-stream,application/json
-      schema:
-        type: string
-    ExportId:
-      in: path
-      description: Unique identifier of an Export.
-      name: exportId
-      required: true
-      schema:
-        type: string
-        format: uuid
-    Range:
-      in: header
-      name: Range
-      description: Byte range `bytes=start-end` (https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.35.1). e.g. bytes=0-1048576. Currently only single range value is supported. Both start and end need to be specified, end value should be greater than start and end - start should not be greater than 5MiB.
-      required: true
-      schema:
-        type: string
   schemas:
+    ExportContents:
+      required:
+      - body
+      properties:
+        body:
+          $ref: '#/components/schemas/BinaryData'
+    Export:
+      type: object
+      description: Client request to export data from a user.
+      required:
+      - contentType
+      properties:
+        contentType:
+          type: string
+          enum:
+          - application/vnd.climate.acrsi.geojson
+          - application/vnd.climate.harvest.geojson
+          format: mime-type
+          description: Content type representing data being exported (e.g. application/vnd.climate.acrsi.geojson).
+        definition:
+          type: object
+          description: Additional specifications for a client's data export request, dependent on the content type.
     Error:
       type: object
       properties:
@@ -401,6 +400,19 @@ components:
             message:
               type: string
               description: Description of the error encountered.
+    CreatedExport:
+      type: object
+      required:
+      - id
+      properties:
+        id:
+          description: Unique identifier for the export.
+          type: string
+          format: uuid
+    BinaryData:
+      description: Binary contents
+      type: string
+      format: binary
     ExportStatus:
       type: object
       required:
@@ -446,43 +458,31 @@ components:
 
             '
           type: string
-    ExportContents:
-      required:
-      - body
-      properties:
-        body:
-          $ref: '#/components/schemas/BinaryData'
-    CreatedExport:
-      type: object
-      required:
-      - id
-      properties:
-        id:
-          description: Unique identifier for the export.
-          type: string
-          format: uuid
     Empty:
       type: object
-    BinaryData:
-      description: Binary contents
-      type: string
-      format: binary
-    Export:
-      type: object
-      description: Client request to export data from a user.
-      required:
-      - contentType
-      properties:
-        contentType:
-          type: string
-          enum:
-          - application/vnd.climate.acrsi.geojson
-          - application/vnd.climate.harvest.geojson
-          format: mime-type
-          description: Content type representing data being exported (e.g. application/vnd.climate.acrsi.geojson).
-        definition:
-          type: object
-          description: Additional specifications for a client's data export request, dependent on the content type.
+  parameters:
+    ExportId:
+      in: path
+      description: Unique identifier of an Export.
+      name: exportId
+      required: true
+      schema:
+        type: string
+        format: uuid
+    Range:
+      in: header
+      name: Range
+      description: Byte range `bytes=start-end` (https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.35.1). e.g. bytes=0-1048576. Currently only single range value is supported. Both start and end need to be specified, end value should be greater than start and end - start should not be greater than 5MiB.
+      required: true
+      schema:
+        type: string
+    Accept:
+      in: header
+      name: Accept
+      required: true
+      description: Must be either \*/* or application/octet-stream,application/json
+      schema:
+        type: string
   securitySchemes:
     oauth2_authorization_code:
       description: 'Log in with FieldView OAuth2 provider (Authorization Code Grant). Used to authorize the client (partner) and

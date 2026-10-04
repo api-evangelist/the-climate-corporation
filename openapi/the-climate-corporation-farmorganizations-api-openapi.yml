@@ -59,18 +59,8 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
-    FetchFarmOrganizationByTypeAndIdOk:
-      description: Returns the requested farm organization.
-      headers:
-        X-Http-Request-Id:
-          schema:
-            type: string
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/FarmOrganization'
-    '404':
-      description: Not Found
+    '403':
+      description: Forbidden
       headers:
         X-Http-Request-Id:
           description: Unique identifier assigned to the request.
@@ -80,8 +70,8 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
-    '500':
-      description: Internal Server Error
+    '400':
+      description: Bad Input
       headers:
         X-Http-Request-Id:
           description: Unique identifier assigned to the request.
@@ -93,6 +83,38 @@ components:
             $ref: '#/components/schemas/Error'
     '429':
       description: Too Many Requests
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '404':
+      description: Not Found
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    FetchFarmOrganizationByTypeAndIdOk:
+      description: Returns the requested farm organization.
+      headers:
+        X-Http-Request-Id:
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/FarmOrganization'
+    '500':
+      description: Internal Server Error
       headers:
         X-Http-Request-Id:
           description: Unique identifier assigned to the request.
@@ -118,29 +140,15 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
-    '403':
-      description: Forbidden
-      headers:
-        X-Http-Request-Id:
-          description: Unique identifier assigned to the request.
-          schema:
-            type: string
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    '400':
-      description: Bad Input
-      headers:
-        X-Http-Request-Id:
-          description: Unique identifier assigned to the request.
-          schema:
-            type: string
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
   parameters:
+    FarmOrganizationId:
+      in: path
+      description: Unique identifier of the farm organization.
+      name: farmOrganizationId
+      required: true
+      schema:
+        type: string
+        format: uuid
     FarmOrganizationType:
       in: path
       description: Type of the farm organization.
@@ -150,14 +158,6 @@ components:
         type: string
         enum:
         - farm
-    FarmOrganizationId:
-      in: path
-      description: Unique identifier of the farm organization.
-      name: farmOrganizationId
-      required: true
-      schema:
-        type: string
-        format: uuid
   schemas:
     Error:
       type: object

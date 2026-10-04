@@ -83,6 +83,50 @@ paths:
           $ref: '#/components/responses/503'
 components:
   responses:
+    '401':
+      description: Unauthorized
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '404':
+      description: Not Found
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '400':
+      description: Bad Input
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '429':
+      description: Too Many Requests
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
     FetchFieldsOk:
       description: OK
       headers:
@@ -92,6 +136,21 @@ components:
             type: string
         X-Next-Token:
           description: Token used to poll for updates.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Fields'
+    FetchFieldsPartial:
+      description: Partial Result
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+        X-Next-Token:
+          description: Token used to fetch next batch of results.
           schema:
             type: string
       content:
@@ -113,17 +172,6 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Empty'
-    '404':
-      description: Not Found
-      headers:
-        X-Http-Request-Id:
-          description: Unique identifier assigned to the request.
-          schema:
-            type: string
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
     FetchFieldByIdOk:
       description: Returns the requested Field.
       headers:
@@ -134,8 +182,8 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Field'
-    '429':
-      description: Too Many Requests
+    '500':
+      description: Internal Server Error
       headers:
         X-Http-Request-Id:
           description: Unique identifier assigned to the request.
@@ -161,32 +209,6 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
-    '400':
-      description: Bad Input
-      headers:
-        X-Http-Request-Id:
-          description: Unique identifier assigned to the request.
-          schema:
-            type: string
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    FetchFieldsPartial:
-      description: Partial Result
-      headers:
-        X-Http-Request-Id:
-          description: Unique identifier assigned to the request.
-          schema:
-            type: string
-        X-Next-Token:
-          description: Token used to fetch next batch of results.
-          schema:
-            type: string
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Fields'
     '403':
       description: Forbidden
       headers:
@@ -198,62 +220,16 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
-    '401':
-      description: Unauthorized
-      headers:
-        X-Http-Request-Id:
-          description: Unique identifier assigned to the request.
-          schema:
-            type: string
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    '500':
-      description: Internal Server Error
-      headers:
-        X-Http-Request-Id:
-          description: Unique identifier assigned to the request.
-          schema:
-            type: string
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
   schemas:
-    Parent:
-      description: A minimal set of attributes regarding the parent of a farm organization.
+    Fields:
+      description: A batch of field results
       required:
-      - id
-      - type
+      - results
       properties:
-        id:
-          description: Unique identifier for the parent of a farm organization.
-          type: string
-          format: uuid
-        type:
-          description: Type of the parent of a farm organization.
-          type: string
-          enum:
-          - farm
-    Error:
-      type: object
-      properties:
-        error:
-          type: object
-          required:
-          - id
-          - code
-          - message
-          properties:
-            id:
-              type: string
-              format: uuid
-            code:
-              type: string
-            message:
-              type: string
-              description: Description of the error encountered.
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Field'
     Field:
       description: Logical representation of a Field with a name.  Spatial attributes of the Field are provided in the Boundary.
       required:
@@ -288,18 +264,56 @@ components:
         parent:
           id: 00000000-0000-0000-0000-000000000000
           type: farm
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          required:
+          - id
+          - code
+          - message
+          properties:
+            id:
+              type: string
+              format: uuid
+            code:
+              type: string
+            message:
+              type: string
+              description: Description of the error encountered.
     Empty:
       type: object
-    Fields:
-      description: A batch of field results
+    Parent:
+      description: A minimal set of attributes regarding the parent of a farm organization.
       required:
-      - results
+      - id
+      - type
       properties:
-        results:
-          type: array
-          items:
-            $ref: '#/components/schemas/Field'
+        id:
+          description: Unique identifier for the parent of a farm organization.
+          type: string
+          format: uuid
+        type:
+          description: Type of the parent of a farm organization.
+          type: string
+          enum:
+          - farm
   parameters:
+    X-Next-Token:
+      name: X-Next-Token
+      in: header
+      description: Opaque string which allows for fetching the next batch of results.  Can be used to poll for changes.
+      required: false
+      schema:
+        type: string
+    OptionalFieldNamePrefix:
+      in: query
+      description: Optional prefix filter for field name. Must be at least 3 characters.
+      name: fieldName
+      required: false
+      schema:
+        type: string
     X-Limit:
       in: header
       name: X-Limit
@@ -310,13 +324,6 @@ components:
         format: int32
         minimum: 1
         maximum: 100
-    OptionalFieldNamePrefix:
-      in: query
-      description: Optional prefix filter for field name. Must be at least 3 characters.
-      name: fieldName
-      required: false
-      schema:
-        type: string
     FieldId:
       in: path
       description: Unique identifier of the Field.
@@ -325,13 +332,6 @@ components:
       schema:
         type: string
         format: uuid
-    X-Next-Token:
-      name: X-Next-Token
-      in: header
-      description: Opaque string which allows for fetching the next batch of results.  Can be used to poll for changes.
-      required: false
-      schema:
-        type: string
   securitySchemes:
     oauth2_authorization_code:
       description: 'Log in with FieldView OAuth2 provider (Authorization Code Grant). Used to authorize the client (partner) and
