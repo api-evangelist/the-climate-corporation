@@ -1,0 +1,12 @@
+{
+ "url": "https://dev.fieldview.com/openapi/platform.yaml",
+ "requested_url": "https://dev.fieldview.com/openapi/platform.yaml",
+ "status": 200,
+ "content_type": "binary/octet-stream",
+ "bytes": 116984,
+ "sha256": "f6831695600ef413198c2598a0445e4fc0aab27373b058b68b209168ad3f3e8b",
+ "fetched_at": "2026-10-04",
+ "fetched_by": "APIEvangelist-Harvest/1.0 (+https://apievangelist.com)",
+ "match": "byte-identical",
+ "note": "Re-fetched from the provider by verify-openapi-sources.py; the archived file is byte-identical to what the provider serves."
+}
