@@ -73,19 +73,8 @@ components:
         email:
           type: string
   responses:
-    '400':
-      description: Bad Input
-      headers:
-        X-Http-Request-Id:
-          description: Unique identifier assigned to the request.
-          schema:
-            type: string
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    '404':
-      description: Not Found
+    '500':
+      description: Internal Server Error
       headers:
         X-Http-Request-Id:
           description: Unique identifier assigned to the request.
@@ -101,8 +90,19 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ResourceOwner'
-    '500':
-      description: Internal Server Error
+    '400':
+      description: Bad Input
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '404':
+      description: Not Found
       headers:
         X-Http-Request-Id:
           description: Unique identifier assigned to the request.

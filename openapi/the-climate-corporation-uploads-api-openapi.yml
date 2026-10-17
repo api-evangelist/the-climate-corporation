@@ -171,139 +171,7 @@ paths:
             schema:
               $ref: '#/components/schemas/UploadStatusQuery'
 components:
-  responses:
-    '401':
-      description: Unauthorized
-      headers:
-        X-Http-Request-Id:
-          description: Unique identifier assigned to the request.
-          schema:
-            type: string
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    '404':
-      description: Not Found
-      headers:
-        X-Http-Request-Id:
-          description: Unique identifier assigned to the request.
-          schema:
-            type: string
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    PostUploadOk:
-      description: Returns a new upload with ID used to PUT file contents.
-      headers:
-        X-Http-Request-Id:
-          schema:
-            type: string
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/CreatedUpload'
-    '400':
-      description: Bad Input
-      headers:
-        X-Http-Request-Id:
-          description: Unique identifier assigned to the request.
-          schema:
-            type: string
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    '429':
-      description: Too Many Requests
-      headers:
-        X-Http-Request-Id:
-          description: Unique identifier assigned to the request.
-          schema:
-            type: string
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    FetchUploadStatusesOk:
-      description: OK
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/UploadStatuses'
-    '500':
-      description: Internal Server Error
-      headers:
-        X-Http-Request-Id:
-          description: Unique identifier assigned to the request.
-          schema:
-            type: string
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    '503':
-      description: Server Busy
-      headers:
-        X-Http-Request-Id:
-          description: Unique identifier assigned to the request.
-          schema:
-            type: string
-        Retry-After:
-          description: Number of seconds to wait before retrying the request.
-          schema:
-            type: integer
-            format: int32
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    FetchUploadStatusByIdOk:
-      description: OK
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/UploadStatus'
-    '403':
-      description: Forbidden
-      headers:
-        X-Http-Request-Id:
-          description: Unique identifier assigned to the request.
-          schema:
-            type: string
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    '204':
-      description: No Content
-      headers:
-        X-Http-Request-Id:
-          description: Unique identifier assigned to the request.
-          schema:
-            type: string
   schemas:
-    UploadStatusQuery:
-      type: object
-      required:
-      - ids
-      properties:
-        ids:
-          type: array
-          items:
-            description: Unique identifier for the upload.
-            type: string
-            format: uuid
-    UploadStatuses:
-      type: object
-      required:
-      - results
-      properties:
-        results:
-          type: array
-          items:
-            $ref: '#/components/schemas/UploadStatus'
     Error:
       type: object
       properties:
@@ -322,6 +190,10 @@ components:
             message:
               type: string
               description: Description of the error encountered.
+    CreatedUpload:
+      type: string
+      format: uuid
+      description: Successfully created upload request
     UploadStatus:
       type: object
       required:
@@ -343,10 +215,29 @@ components:
           - DECLINED
           - IMPORTING
           - SUCCESS
-    CreatedUpload:
-      type: string
-      format: uuid
-      description: Successfully created upload request
+    Metadata:
+      type: object
+      additionalProperties: true
+    UploadStatuses:
+      type: object
+      required:
+      - results
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/UploadStatus'
+    UploadStatusQuery:
+      type: object
+      required:
+      - ids
+      properties:
+        ids:
+          type: array
+          items:
+            description: Unique identifier for the upload.
+            type: string
+            format: uuid
     Upload:
       type: object
       description: Client request to upload data for a user.
@@ -384,10 +275,126 @@ components:
           description: Content size in bytes
         metadata:
           $ref: '#/components/schemas/Metadata'
-    Metadata:
-      type: object
-      additionalProperties: true
+  responses:
+    '400':
+      description: Bad Input
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    FetchUploadStatusByIdOk:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UploadStatus'
+    '429':
+      description: Too Many Requests
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '503':
+      description: Server Busy
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+        Retry-After:
+          description: Number of seconds to wait before retrying the request.
+          schema:
+            type: integer
+            format: int32
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '401':
+      description: Unauthorized
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '204':
+      description: No Content
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+    FetchUploadStatusesOk:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UploadStatuses'
+    '500':
+      description: Internal Server Error
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '404':
+      description: Not Found
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '403':
+      description: Forbidden
+      headers:
+        X-Http-Request-Id:
+          description: Unique identifier assigned to the request.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    PostUploadOk:
+      description: Returns a new upload with ID used to PUT file contents.
+      headers:
+        X-Http-Request-Id:
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CreatedUpload'
   parameters:
+    X-Recipient-Email:
+      in: header
+      name: X-Recipient-Email
+      description: Email address associated with a Climate account, used when to sending to another user.
+      required: false
+      schema:
+        type: string
     ContentRange:
       in: header
       name: Content-Range
@@ -403,13 +410,6 @@ components:
       schema:
         type: string
         format: uuid
-    X-Recipient-Email:
-      in: header
-      name: X-Recipient-Email
-      description: Email address associated with a Climate account, used when to sending to another user.
-      required: false
-      schema:
-        type: string
     BinaryContentType:
       in: header
       name: Content-Type
